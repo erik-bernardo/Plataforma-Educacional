@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Payouts - Distribuição de Lucros</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Variáveis de layout */
+        :root {
+            --sidebar-width: 350px;
+            --header-height: 55px;
+            --cor-primaria: #008CBA; /* Azul (Total Payout) */
+            --cor-secundaria: #4CAF50; /* Verde (Lucro da Empresa) */
+            --cor-fundo-app: #ffffff;
+            --cor-fundo-pagina: #f0f8ff;
+        }
+
+        /* --- ESTILOS DO HEADER (Baseado em mruv.html) --- */
+        body {
+            background-color: var(--cor-fundo-pagina);
+            margin: 0;
+            padding: 0;
+            padding-top: var(--header-height); 
+            font-family: sans-serif;
+            display: flex;
+        }
+
+        .top-bar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            height: var(--header-height); 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100; 
+            display: flex;
+            align-items: stretch; 
+            border-bottom: 1px solid #ddd; 
+            box-sizing: border-box; 
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: #D2691E; 
+            font-size: 18px;
+            font-weight: bold;
+            padding: 0 25px; 
+            display: flex;
+            align-items: center; 
+            border-right: 1px solid #ddd; 
+            transition: background-color 0.3s;
+        }
+        
+        .page-title {
+            padding: 0 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* --- ESTILOS DO PAINEL DE CONTROLE (SIDEBAR) --- */
+        #inputPanel {
+            position: fixed;
+            top: var(--header-height); 
+            left: 0;
+            width: var(--sidebar-width); 
+            height: calc(100vh - var(--header-height)); 
+            background-color: var(--cor-fundo-app);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); 
+            padding: 15px; 
+            box-sizing: border-box;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; 
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .label {
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #555;
+            font-weight: bold;
+            display: block; 
+        }
+
+        .dataInput {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        /* Input de número de funcionários */
+        #numFuncionarios {
+            width: 50px; 
+            text-align: center;
+        }
+        
+        /* Botão */
+        .action-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            background-color: var(--cor-secundaria);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .action-button:hover {
+            background-color: #45a049;
+        }
+
+        /* --- ESTILOS DA ÁREA DE RESULTADOS --- */
+        #resultsArea {
+            flex-grow: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: white;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .result-box {
+            background-color: #e0f7ff;
+            border-left: 5px solid var(--cor-primaria);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .result-box.final-profit {
+            background-color: #e8f5e9;
+            border-left: 5px solid var(--cor-secundaria);
+        }
+
+        .result-box h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .result-box .valor {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--cor-primaria);
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .result-box.final-profit .valor {
+            color: var(--cor-secundaria);
+        }
+        
+        /* Listagem de funcionários */
+        #employeeWeights, #employeePayouts {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        
+        .employee-input-row, .employee-payout-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 4px 0;
+            border-bottom: 1px dotted #ddd;
+        }
+        
+        .employee-input-row:last-child, .employee-payout-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .employee-input-row label {
+            flex-grow: 1;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .employee-input-row input {
+            width: 80px;
+            text-align: right;
+            padding: 6px;
+        }
+        
+        .payout-label {
+            flex-grow: 1;
+            font-weight: bold;
+            color: #008CBA;
+        }
+        
+        .payout-value {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .employee-payout-row:nth-child(even) {
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <header class="top-bar">
+        <a href="index.html" class="logo-link">
+            <i class="fas fa-book-reader"></i> PLATAFORMA
+        </a>
+        <div class="nav-buttons">
+            <span class="page-title">CALCULADORA DE DISTRIBUIÇÃO DE LUCROS</span>
+        </div>
+    </header>
+    
+    <div id="inputPanel">
+        <h2>Dados Financeiros</h2>
+        
+        <div class="input-group">
+            <label class="label" for="rendaTotal">Renda Total da Empresa (R$)</label>
+            <input type="text" id="rendaTotal" class="dataInput" value="100000">
+        </div>
+        
+        <div class="input-group">
+            <label class="label" for="gastosEfetivos">Gastos Efetivos (Matéria/Consumo) (R$)</label>
+            <input type="text" id="gastosEfetivos" class="dataInput" value="30000">
+        </div>
+
+        <div class="input-group">
+            <label class="label" for="lucroEspecifico">Porcentagem de Lucro da Empresa (pós-gastos) (%)</label>
+            <input type="number" id="lucroEspecifico" class="dataInput" value="30" min="0" max="100">
+        </div>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+
+        <h2>Distribuição de Payouts</h2>
+
+        <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+            <label class="label" style="margin-bottom: 0;" for="numFuncionarios">Número de Funcionários:</label>
+            <input type="number" id="numFuncionarios" class="dataInput" value="3" min="1" onchange="gerarInputsFuncionarios()">
+        </div>
+        
+        <div class="input-group">
+            <label class="label">Peso/Série de Pagamento de Cada Funcionário:</label>
+            <div id="employeeWeights">
+                </div>
+            <small style="display: block; margin-top: 5px; color: #777;">O **peso** define a proporção do payout que cada funcionário receberá. (Ex: 1 = Padrão, 2 = Dobro do Padrão).</small>
+        </div>
+
+        <button id="calculateButton" class="action-button" onclick="calcularPayout()">CALCULAR DISTRIBUIÇÃO</button>
+    </div>
+    
+    <div id="resultsArea">
+        <h2>Resultados da Distribuição</h2>
+        
+        <div id="resultsContainer">
+            <p>Preencha os dados no painel lateral e clique em **CALCULAR DISTRIBUIÇÃO** para ver os resultados.</p>
+        </div>
+
+        <div id="payoutDetails" style="margin-top: 30px; display: none;">
+            <h3>Detalhes do Payout por Funcionário</h3>
+            <div id="employeePayouts">
+                </div>
+        </div>
+        
+    </div>
+
+    <script>
+        // Função auxiliar para garantir a leitura de números (lidando com , e .)
+        function parseCurrency(value) {
+            // Remove pontos de milhar, substitui vírgula por ponto decimal, e faz o parsing
+            const cleanValue = String(value).replace(/\./g, '').replace(',', '.');
+            return parseFloat(cleanValue) || 0;
+        }
+
+        // Função auxiliar para formatar a saída como moeda brasileira
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+        
+        // --- LÓGICA DE GERAÇÃO DE INPUTS ---
+        function gerarInputsFuncionarios() {
+            const numFuncionariosInput = document.getElementById('numFuncionarios');
+            const container = document.getElementById('employeeWeights');
+            
+            let numFuncionarios = parseInt(numFuncionariosInput.value) || 1;
+            
+            // Limita o número de funcionários para evitar sobrecarga (ex: 50)
+            numFuncionarios = Math.max(1, Math.min(50, numFuncionarios));
+            numFuncionariosInput.value = numFuncionarios;
+
+            // Coleta os pesos atuais para tentar restaurar
+            const pesosAtuais = Array.from(document.querySelectorAll('.employee-weight')).map(input => input.value);
+
+            container.innerHTML = ''; // Limpa os inputs anteriores
+
+            for (let i = 1; i <= numFuncionarios; i++) {
+                const row = document.createElement('div');
+                row.className = 'employee-input-row';
+                
+                const label = document.createElement('label');
+                label.textContent = `Funcionário #${i} (Peso/Série):`;
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'employee-weight';
+                input.min = '0';
+                input.setAttribute('data-id', i);
+                
+                // Restaura o valor anterior ou usa o padrão
+                input.value = pesosAtuais[i - 1] !== undefined ? pesosAtuais[i - 1] : '1'; 
+                
+                row.appendChild(label);
+                row.appendChild(input);
+                container.appendChild(row);
+            }
+        }
+        
+        // --- LÓGICA PRINCIPAL DE CÁLCULO ---
+        function calcularPayout() {
+            // 1. Leitura e Limpeza dos Inputs
+            const rendaTotal = parseCurrency(document.getElementById('rendaTotal').value);
+            const gastosEfetivos = parseCurrency(document.getElementById('gastosEfetivos').value);
+            const lucroEspecificoPct = parseCurrency(document.getElementById('lucroEspecifico').value) / 100;
+            
+            const resultsContainer = document.getElementById('resultsContainer');
+            const employeeWeightsInputs = document.querySelectorAll('.employee-weight');
+            const numFuncionarios = employeeWeightsInputs.length;
+            
+            // Validações básicas
+            if (rendaTotal < 0 || gastosEfetivos < 0 || lucroEspecificoPct < 0 || lucroEspecificoPct > 1) {
+                resultsContainer.innerHTML = `<p style="color: red; font-weight: bold;">Erro de Validação: Certifique-se de que os valores de renda, gastos e a porcentagem de lucro (entre 0 e 100) são válidos.</p>`;
+                document.getElementById('payoutDetails').style.display = 'none';
+                return;
+            }
+
+            // 2. Cálculo do Lucro Bruto
+            const lucroBruto = rendaTotal - gastosEfetivos;
+            
+            if (lucroBruto <= 0) {
+                 resultsContainer.innerHTML = `<p style="color: orange; font-weight: bold;">Lucro Bruto (R$ ${formatCurrency(lucroBruto)}) é zero ou negativo. Não há valor para distribuição de Payout.</p>`;
+                document.getElementById('payoutDetails').style.display = 'none';
+                return;
+            }
+
+            // 3. Cálculo do Lucro Específico da Empresa (LE)
+            const lucroEspecificoEmpresa = lucroBruto * lucroEspecificoPct;
+            
+            // 4. Cálculo do Total para Payout dos Funcionários (PFE)
+            const totalPayoutFuncionarios = lucroBruto - lucroEspecificoEmpresa;
+
+            // 5. Leitura dos Pesos e Cálculo do Peso Total
+            let totalWeight = 0;
+            const pesos = [];
+            
+            let erroPesoNegativo = false;
+            employeeWeightsInputs.forEach(input => {
+                const peso = parseCurrency(input.value);
+                if (peso < 0) {
+                    erroPesoNegativo = true;
+                }
+                totalWeight += peso;
+                pesos.push(peso);
+            });
+            
+            if (erroPesoNegativo) {
+                resultsContainer.innerHTML = `<p style="color: red; font-weight: bold;">Erro de Validação: O peso do funcionário não pode ser negativo.</p>`;
+                document.getElementById('payoutDetails').style.display = 'none';
+                return;
+            }
+            
+            if (totalWeight <= 0) {
+                 resultsContainer.innerHTML = `<p style="color: orange; font-weight: bold;">Erro: A soma dos pesos dos funcionários é zero. Defina pesos (acima de 0) para distribuir o payout.</p>`;
+                 document.getElementById('payoutDetails').style.display = 'none';
+                 return;
+            }
+            
+            // 6. Cálculo dos Payouts Individuais
+            const employeePayoutsContainer = document.getElementById('employeePayouts');
+            employeePayoutsContainer.innerHTML = '';
+            
+            let htmlPayouts = '';
+            pesos.forEach((peso, index) => {
+                const payoutIndividual = totalPayoutFuncionarios * (peso / totalWeight);
+                
+                htmlPayouts += `
+                    <div class="employee-payout-row">
+                        <span class="payout-label">Funcionário #${index + 1} (Peso ${peso.toFixed(2).replace('.', ','):}):</span>
+                        <span class="payout-value">${formatCurrency(payoutIndividual)}</span>
+                    </div>
+                `;
+            });
+            employeePayoutsContainer.innerHTML = htmlPayouts;
+
+
+            // 7. Exibição dos Resultados Finais
+            let htmlResults = `
+                <div class="result-box">
+                    <h3>Lucro Bruto (Renda - Gastos Efetivos)</h3>
+                    <span class="valor">${formatCurrency(lucroBruto)}</span>
+                </div>
+                
+                <div class="result-box final-profit">
+                    <h3>Lucro Específico da Empresa (${(lucroEspecificoPct * 100).toFixed(1).replace('.', ','):}% do Lucro Bruto)</h3>
+                    <span class="valor">${formatCurrency(lucroEspecificoEmpresa)}</span>
+                </div>
+                
+                <div class="result-box">
+                    <h3>Valor Total Destinado ao Payout dos Funcionários</h3>
+                    <span class="valor">${formatCurrency(totalPayoutFuncionarios)}</span>
+                    <small style="display: block; margin-top: 5px; color: #777;">Distribuído entre **${numFuncionarios} funcionários** com um **Peso Total de ${totalWeight.toFixed(2).replace('.', ',')}**.</small>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = htmlResults;
+            document.getElementById('payoutDetails').style.display = 'block';
+        }
+
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Gera os inputs iniciais ao carregar a página
+            gerarInputsFuncionarios();
+        });
+    </script>
+</body>
+</html>
