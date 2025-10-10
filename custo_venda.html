@@ -273,14 +273,17 @@
             border-radius: 5px;
         }
 
-        .bulk-result {
+        /* Estilo para o resultado final da seção Bulk (Valor Total) */
+        .bulk-final-result {
             margin-top: 15px;
-            padding: 10px;
+            padding: 10px 0;
             background-color: #e8f5e9; /* Verde bem claro */
             border-radius: 5px;
             font-size: 1.2em;
             font-weight: bold;
             color: #2e7d32;
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
@@ -352,19 +355,29 @@
                     
                     <div class="bulk-input">
                         <label for="bulkQuantity">Quantidade Mínima para Desconto:</label>
-                        <input type="number" id="bulkQuantity" value="10" min="1" oninput="updateBulkPricing()">
+                        <input type="number" id="bulkQuantity" value="10" min="1" oninput="calculatePrice()">
                     </div>
                     
                     <div class="bulk-input">
                         <label for="bulkDiscount">Desconto (em %):</label>
-                        <input type="number" id="bulkDiscount" value="10" min="0" max="100" step="0.5" oninput="updateBulkPricing()">
+                        <input type="number" id="bulkDiscount" value="10" min="0" max="100" step="0.5" oninput="calculatePrice()">
                     </div>
 
-                    <div class="bulk-result">
-                        <span>Preço p/ Grande Qtd. (Unidade):</span>
+                    <div class="result-line" style="margin-top: 15px;">
+                        <span>Preço Unitário c/ Desconto:</span>
                         <span id="bulkPrice" class="value">R$ 0,00</span>
                     </div>
-                </div>
+                    
+                    <div class="bulk-final-result">
+                        <span>Valor Total dos Produtos:</span>
+                        <span id="totalBulkValue" class="value">R$ 0,00</span>
+                    </div>
+                    
+                    <div class="result-line" style="border-bottom: none;">
+                        <span>Lucro % (na Venda Total):</span>
+                        <span id="bulkProfitPercent" class="value" style="color: var(--cor-financeira);">0,00 %</span>
+                    </div>
+                    </div>
 
             </div>
         </div>
@@ -373,7 +386,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Adiciona um item de custo inicial ao carregar
+            // Adiciona itens de custo iniciais
             addCostItem('Custo Direto (Matéria-prima)', 50.00); 
             addCostItem('Custo Indireto (Embalagem/Mão de obra)', 5.00);
             calculatePrice();
@@ -383,8 +396,6 @@
 
         /**
          * Adiciona um novo campo de custo à lista.
-         * @param {string} name - Nome padrão do custo.
-         * @param {number} value - Valor padrão do custo.
          */
         function addCostItem(name = 'Novo Custo', value = 0.00) {
             const itemDiv = document.createElement('div');
@@ -402,7 +413,6 @@
 
         /**
          * Remove um item de custo da lista.
-         * @param {HTMLElement} button - O botão de remoção clicado.
          */
         function removeCostItem(button) {
             button.closest('.cost-item').remove();
@@ -410,32 +420,48 @@
         }
 
         /**
-         * Atualiza o preço para grande quantidade com base no Preço Final.
-         */
-        function updateBulkPricing() {
-            const finalPriceText = document.getElementById('finalPrice').textContent;
-            // Remove R$, espaços e substitui vírgula por ponto
-            const finalPrice = parseFloat(finalPriceText.replace('R$', '').trim().replace(',', '.') || 0);
-
-            const discount = parseFloat(document.getElementById('bulkDiscount').value) || 0;
-            const quantity = parseFloat(document.getElementById('bulkQuantity').value) || 0;
-            
-            let bulkPrice = finalPrice;
-            
-            if (discount > 0 && finalPrice > 0) {
-                 // Aplica o desconto percentual
-                const discountFactor = 1 - (discount / 100);
-                bulkPrice = finalPrice * discountFactor;
-            }
-
-            document.getElementById('bulkPrice').textContent = formatCurrency(bulkPrice);
-        }
-
-        /**
          * Formata um número para o formato de moeda R$.
          */
         function formatCurrency(number) {
             return 'R$ ' + number.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        /**
+         * Atualiza o preço para grande quantidade, total e lucro percentual.
+         * @param {number} unitCost - Custo unitário total do produto.
+         * @param {number} unitPriceNoDiscount - Preço unitário final sem desconto.
+         */
+        function updateBulkPricing(unitCost, unitPriceNoDiscount) {
+            const discount = parseFloat(document.getElementById('bulkDiscount').value) || 0;
+            const quantity = parseFloat(document.getElementById('bulkQuantity').value) || 1; 
+            
+            let unitBulkPrice = unitPriceNoDiscount;
+            
+            if (discount > 0 && unitPriceNoDiscount > 0) {
+                // Aplica o desconto percentual
+                const discountFactor = 1 - (discount / 100);
+                unitBulkPrice = unitPriceNoDiscount * discountFactor;
+            }
+            
+            // --- CÁLCULOS DOS NOVOS CAMPOS ---
+            const totalBulkValue = unitBulkPrice * quantity; // Valor dos produtos juntos
+            const totalBulkCost = unitCost * quantity;
+            
+            let bulkProfitPercent = 0;
+            if (totalBulkCost > 0) {
+                // Lucro % = ((Venda Total - Custo Total) / Custo Total) * 100
+                bulkProfitPercent = ((totalBulkValue - totalBulkCost) / totalBulkCost) * 100;
+            } else if (totalBulkValue > 0) {
+                // Se o custo for zero, o lucro é 100% (ou infinito, mas 100% é mais prático)
+                bulkProfitPercent = 100;
+            }
+            
+            // --- EXIBIÇÃO DOS NOVOS RESULTADOS ---
+            document.getElementById('bulkPrice').textContent = formatCurrency(unitBulkPrice);
+            document.getElementById('totalBulkValue').textContent = formatCurrency(totalBulkValue);
+            // Garante que o lucro zero não apareça negativo
+            const percentDisplay = Math.max(0, bulkProfitPercent).toFixed(2).replace('.', ',');
+            document.getElementById('bulkProfitPercent').textContent = percentDisplay + ' %';
         }
 
         /**
@@ -464,7 +490,8 @@
             document.getElementById('finalPrice').textContent = formatCurrency(finalPrice);
             
             // 5. ATUALIZA O PREÇO DE GRANDE QUANTIDADE
-            updateBulkPricing();
+            // Passando o Custo Unitário (totalCost) e o Preço Unitário sem Desconto (finalPrice)
+            updateBulkPricing(totalCost, finalPrice);
         }
 
     </script>
