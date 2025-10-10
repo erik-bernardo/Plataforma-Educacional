@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Payouts - Distribuição de Lucros (Avançado)</title>
+    <title>Calculadora de Payouts - Distribuição de Lucros (Função f(x))</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Variáveis de layout */
@@ -16,7 +16,7 @@
             --cor-fundo-pagina: #f0f8ff;
         }
 
-        /* --- ESTILOS DO HEADER --- */
+        /* --- ESTILOS GERAIS E LAYOUT --- */
         body {
             background-color: var(--cor-fundo-pagina);
             margin: 0;
@@ -267,12 +267,12 @@
         <h2>Regra de Payouts</h2>
         
         <div class="input-group">
-            <label class="label" for="fxInput">Função de Payout (f(x) onde x é o Peso Base)</label>
+            <label class="label" for="fxInput">Função de Payout (f(x) onde x é o Peso)</label>
             <div id="functionInputContainer">
                 <span>f(x) =</span>
                 <input type="text" id="fxInput" class="dataInput" value="x" placeholder="Ex: x, x*x, 2*x + 1">
             </div>
-            <small style="display: block; margin-top: 5px; color: #777;">Use `x` para o peso base, e funções JavaScript (ex: `Math.log(x)`, `Math.pow(x, 3)`).</small>
+            <small style="display: block; margin-top: 5px; color: #777;">Use `x` para o **Peso** do funcionário. Você pode usar funções JavaScript (ex: `Math.pow(x, 2)`, `Math.log(x)`).</small>
         </div>
 
         <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
@@ -281,10 +281,10 @@
         </div>
         
         <div class="input-group">
-            <label class="label">Peso Base (x) de Cada Funcionário:</label>
+            <label class="label">Peso (Série de Pagamento) de Cada Funcionário:</label>
             <div id="employeeWeights">
                 </div>
-            <small style="display: block; margin-top: 5px; color: #777;">O **Peso Base (x)** será processado pela função f(x) para definir a distribuição.</small>
+            <small style="display: block; margin-top: 5px; color: #777;">O **Peso (x)** será processado pela função f(x) para definir o Peso Final para distribuição.</small>
         </div>
 
         <button id="calculateButton" class="action-button" onclick="calcularPayout()">CALCULAR DISTRIBUIÇÃO</button>
@@ -308,7 +308,6 @@
     <script>
         // Função auxiliar para garantir a leitura de números (lidando com , e .)
         function parseCurrency(value) {
-            // Remove pontos de milhar, substitui vírgula por ponto decimal, e faz o parsing
             const cleanValue = String(value).replace(/\./g, '').replace(',', '.');
             return parseFloat(cleanValue) || 0;
         }
@@ -330,11 +329,10 @@
             
             let numFuncionarios = parseInt(numFuncionariosInput.value) || 1;
             
-            // Limita o número de funcionários para evitar sobrecarga (max 50)
             numFuncionarios = Math.max(1, Math.min(50, numFuncionarios));
             numFuncionariosInput.value = numFuncionarios;
 
-            // Coleta os pesos base atuais para tentar restaurar
+            // Coleta os pesos atuais para tentar restaurar
             const pesosAtuais = Array.from(document.querySelectorAll('.employee-weight')).map(input => input.value);
 
             container.innerHTML = ''; // Limpa os inputs anteriores
@@ -344,7 +342,7 @@
                 row.className = 'employee-input-row';
                 
                 const label = document.createElement('label');
-                label.textContent = `Funcionário #${i} (Peso Base x):`;
+                label.textContent = `Funcionário #${i} (Peso x):`;
                 
                 const input = document.createElement('input');
                 input.type = 'number';
@@ -378,8 +376,7 @@
             let calculateWeight;
             
             try {
-                // Cria uma função dinâmica: new Function('x', 'return ' + fxString)
-                // Isto permite usar Math.pow, Math.log, etc. e é mais seguro que eval().
+                // Cria a função dinâmica f(x). Esta é a linha onde o erro de referência foi corrigido.
                 calculateWeight = new Function('x', 'return ' + fxString);
             } catch (e) {
                 resultsContainer.innerHTML = `<p style="color: red; font-weight: bold;">Erro de Sintaxe na Função de Payout f(x): "${fxString}". Verifique a sintaxe JavaScript.</p>`;
@@ -398,36 +395,39 @@
             const lucroEspecificoEmpresa = lucroBruto * lucroEspecificoPct;
             const totalPayoutFuncionarios = lucroBruto - lucroEspecificoEmpresa;
 
-            // 5. Leitura dos Pesos Base (x) e Cálculo dos Pesos Finais (W)
+            // 5. Leitura dos Pesos (x) e Cálculo dos Pesos Finais (W)
             let totalWeightFinal = 0;
             const pesosFinais = [];
             const employeeWeightsInputs = document.querySelectorAll('.employee-weight');
             
             let erroCalculoFuncao = false;
             employeeWeightsInputs.forEach(input => {
-                const pesoBase = parseCurrency(input.value);
+                const peso = parseCurrency(input.value); // O input é lido como 'x'
                 let pesoFinal = 0;
                 
                 try {
                     // Calcula o peso final W = f(x)
-                    pesoFinal = calculateWeight(pesoBase);
+                    pesoFinal = calculateWeight(peso);
                     
                     if (isNaN(pesoFinal) || !isFinite(pesoFinal)) {
-                        erroCalculoFuncao = `O cálculo f(${pesoBase}) resultou em um valor inválido.`;
-                        return; // Sai do forEach
+                        const pesoStr = peso.toFixed(2).replace('.', ',');
+                        erroCalculoFuncao = `O cálculo f(${pesoStr}) resultou em um valor inválido.`;
+                        return; 
                     }
                     if (pesoFinal < 0) {
-                        erroCalculoFuncao = `O Peso Final (f(${pesoBase}) = ${pesoFinal.toFixed(2)}) não pode ser negativo. Ajuste a função f(x) ou o Peso Base.`;
-                        return; // Sai do forEach
+                        const pesoStr = peso.toFixed(2).replace('.', ',');
+                        const pesoFinalStr = pesoFinal.toFixed(2).replace('.', ',');
+                        erroCalculoFuncao = `O Peso Final (f(${pesoStr}) = ${pesoFinalStr}) não pode ser negativo. Ajuste a função f(x) ou o Peso.`;
+                        return; 
                     }
 
                 } catch (e) {
                     erroCalculoFuncao = `Erro de execução na função f(x): ${e.message}`;
-                    return; // Sai do forEach
+                    return; 
                 }
                 
                 totalWeightFinal += pesoFinal;
-                pesosFinais.push({ pesoBase, pesoFinal });
+                pesosFinais.push({ peso, pesoFinal }); // Armazena o peso original e o final
             });
             
             if (erroCalculoFuncao) {
@@ -436,7 +436,7 @@
             }
             
             if (totalWeightFinal <= 0) {
-                 resultsContainer.innerHTML = `<p style="color: orange; font-weight: bold;">Erro: A soma dos Pesos Finais (&sum;f(x)) é zero. Defina Pesos Base (x) ou ajuste a função f(x).</p>`;
+                 resultsContainer.innerHTML = `<p style="color: orange; font-weight: bold;">Erro: A soma dos Pesos Finais (&sum;f(x)) é zero. Defina Pesos (x) ou ajuste a função f(x).</p>`;
                  return;
             }
             
@@ -449,10 +449,14 @@
                 const proporcao = data.pesoFinal / totalWeightFinal;
                 const payoutIndividual = totalPayoutFuncionarios * proporcao;
                 
+                // Pré-formatação para evitar o erro de sintaxe no template string (CORREÇÃO FINAL)
+                const pesoStr = data.peso.toFixed(2).replace('.', ',');
+                const pesoFinalStr = data.pesoFinal.toFixed(2).replace('.', ',');
+                
                 htmlPayouts += `
                     <div class="employee-payout-row">
-                        <span class="payout-label">Func. #${index + 1} (Base ${data.pesoBase.toFixed(2).replace('.', ',')})</span>
-                        <span class="payout-weight">Peso Final: ${data.pesoFinal.toFixed(2).replace('.', ',')}</span>
+                        <span class="payout-label">Func. #${index + 1} (Peso ${pesoStr})</span>
+                        <span class="payout-weight">Peso Final: ${pesoFinalStr}</span>
                         <span class="payout-value">${formatCurrency(payoutIndividual)}</span>
                     </div>
                 `;
@@ -461,6 +465,10 @@
 
 
             // 7. Exibição dos Resultados Finais
+            // Pré-formatação dos totais para o resultado
+            const lucroPctStr = (lucroEspecificoPct * 100).toFixed(1).replace('.', ',');
+            const totalWeightStr = totalWeightFinal.toFixed(2).replace('.', ',');
+            
             let htmlResults = `
                 <div class="result-box">
                     <h3>Lucro Bruto (Renda - Gastos Efetivos)</h3>
@@ -468,14 +476,14 @@
                 </div>
                 
                 <div class="result-box final-profit">
-                    <h3>Lucro Específico da Empresa (${(lucroEspecificoPct * 100).toFixed(1).replace('.', ','):}% do Lucro Bruto)</h3>
+                    <h3>Lucro Específico da Empresa (${lucroPctStr}% do Lucro Bruto)</h3>
                     <span class="valor">${formatCurrency(lucroEspecificoEmpresa)}</span>
                 </div>
                 
                 <div class="result-box">
                     <h3>Valor Total Destinado ao Payout dos Funcionários</h3>
                     <span class="valor">${formatCurrency(totalPayoutFuncionarios)}</span>
-                    <small style="display: block; margin-top: 5px; color: #777;">Distribuído entre **${pesosFinais.length} funcionários** com um **Peso Final Total de ${totalWeightFinal.toFixed(2).replace('.', ',')}**.</small>
+                    <small style="display: block; margin-top: 5px; color: #777;">Distribuído entre **${pesosFinais.length} funcionários** com um **Peso Final Total de ${totalWeightStr}**.</small>
                 </div>
             `;
             
