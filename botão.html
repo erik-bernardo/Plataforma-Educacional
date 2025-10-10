@@ -1,0 +1,49 @@
+<header class="top-bar">
+    <a href="index.html" class="logo-link">
+        <i class="fas fa-book-reader"></i> PLATAFORMA
+    </a>
+
+    <div class="nav-buttons">
+        <button class="nav-button active"><i class="fas fa-arrow-up"></i> MATÉRIAS</button>
+        <button class="nav-button"><i class="fas fa-arrow-down"></i> EXE. DE APOIO</button>
+        <button class="nav-button"><i class="fas fa-arrow-down"></i> VIDEO AULA</button>
+        <button class="nav-button more-options">...</button>
+    </div>
+</header>
+
+/* ----------------------------------- */
+/* BARRA SUPERIOR DE NAVEGAÇÃO (TOP-BAR) */
+/* ----------------------------------- */
+
+.top-bar {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    margin-bottom: 20px;
+    
+    /* Flexbox para alinhar logo e botões */
+    display: flex;
+    align-items: stretch; /* Garante que o link e os botões tenham a mesma altura */
+    border-bottom: 1px solid #ddd; /* Linha divisória em toda a barra */
+}
+
+/* Link do Logo */
+.logo-link {
+    text-decoration: none;
+    color: #D2691E; /* Cor de destaque */
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0 25px; 
+    display: flex;
+    align-items: center; /* Centraliza o texto e o ícone verticalmente */
+    border-right: 1px solid #ddd; /* Separador visual do menu */
+    transition: background-color 0.3s;
+}
+
+.logo-link:hover {
+    background-color: #f5f5f5;
+}
+
+.logo-link .fas {
+    margin-right: 10px;
+}
