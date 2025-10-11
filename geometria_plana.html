@@ -19,9 +19,9 @@
             --cor-card: #ffffff;
             --cor-destaque: #D2691E; 
             --cor-geogebra-bg: #ffffff;
-            --cor-geogebra-grid: #aaaaaa; /* MAIS ESCURO: MAIOR VISIBILIDADE DO GRID */
+            --cor-geogebra-grid: #aaaaaa; 
             --cor-geogebra-eixos: #9e9e9e;
-            --cor-ponto-ativo: #ff0000; /* Ponto sendo desenhado */
+            --cor-ponto-ativo: #ff0000; 
         }
 
         body {
@@ -34,6 +34,51 @@
             display: flex; 
             min-height: 100vh;
             outline: none; 
+        }
+        
+        /* ----------------------------------- */
+        /* TELA DE CARREGAMENTO */
+        /* ----------------------------------- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.98); 
+            color: var(--cor-secundaria);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; 
+            transition: opacity 0.5s ease;
+            pointer-events: all;
+            text-align: center;
+        }
+        
+        #loading-overlay h3 {
+             color: var(--cor-primaria);
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid var(--cor-destaque); 
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
         }
         
         /* ----------------------------------- */
@@ -86,7 +131,6 @@
             border-bottom: 1px solid #ddd;
         }
 
-        /* Corrigido: o listener é adicionado ao botão, mas se clicar no <i> o e.target falha. Usamos e.currentTarget no JS. */
         .tab-button {
             flex-grow: 1;
             padding: 10px 5px;
@@ -183,7 +227,13 @@
         
     </style>
 </head>
-<body onload="initCanvas()" tabindex="0">
+<body tabindex="0">
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <h3>Carregando a Calculadora de Geometria...</h3>
+        <p>Se o erro persistir,voltar a pagina principal<p>
+    </div>
 
     <header class="top-bar">
         <a href="#" class="logo-link"><i class="fas fa-drafting-compass"></i> GEOPLAT</a>
@@ -320,53 +370,119 @@
         const modeIndicator = document.getElementById('mode-indicator');
         
         // Estado do Canvas e Desenho
-        let scale = 30; // pixels por unidade (zoom inicial)
-        let offsetX = 0; // Deslocamento X do canvas (pan)
-        let offsetY = 0; // Deslocamento Y do canvas (pan)
-        const gridStep = 1; // Unidade da malha
+        let scale = 30; 
+        let offsetX = 0; 
+        let offsetY = 0; 
+        const gridStep = 1; 
         
-        let objects = []; // Armazena as formas desenhadas (polígonos, polilinhas)
-        let drawingMode = 'none'; // 'none', 'polygon', 'polyline'
-        let tempObject = null; // Objeto temporário em construção
+        let objects = []; 
+        let drawingMode = 'none'; 
+        let tempObject = null; 
+        
+        // Flag para garantir que o desenho ocorra apenas quando o estado mudar
+        let needsRedraw = true; 
         
         // --- FUNÇÕES DE SETUP E DESENHO DO CANVAS ---
 
         function initCanvas() {
+             // 1. Configura o tamanho do canvas
             canvas.width = mainContent.clientWidth;
             canvas.height = mainContent.clientHeight;
             
+            // 2. Centraliza o offset
             offsetX = canvas.width / 2;
             offsetY = canvas.height / 2;
-
-            drawGrid();
             
-            // Adiciona listeners
-            canvas.addEventListener('wheel', handleZoom);
-            window.addEventListener('keydown', handlePan);
-            canvas.addEventListener('mousedown', handleDrawingClick);
-            
-            // FIX DE BUG: Adiciona o listener de clique nas abas
-            document.querySelectorAll('.tab-button').forEach(button => {
-                // Usando 'click' e a lógica de e.currentTarget na função switchTab
-                button.addEventListener('click', switchTab);
-            });
-            
-            // Dispara cálculos iniciais
+            // 3. Dispara cálculos iniciais
             calculateCircle();
             calculateDiameter();
             calculateHipotenusa();
             calculateTrig();
             calculateThales();
-            
-            document.body.focus();
+
+            // 4. Marca para o primeiro desenho e inicia o loop
+            needsRedraw = true;
+            requestAnimationFrame(gameLoop);
+        }
+
+        /**
+         * Loop principal de animação, chamado pelo requestAnimationFrame.
+         * Garante que o desenho seja sincronizado com a taxa de quadros do navegador.
+         */
+        function gameLoop() {
+            if (needsRedraw) {
+                draw();
+                needsRedraw = false;
+            }
+            requestAnimationFrame(gameLoop);
         }
         
+        /**
+         * FUNÇÃO DE DESENHO PRINCIPAL: Chama drawGrid e outros elementos.
+         */
+        function draw() {
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--cor-geogebra-bg').trim();
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawGridLines();
+            drawAxes();
+            drawObjects();
+        }
+
+        /**
+         * Desenha APENAS as linhas da malha que estão visíveis.
+         */
+        function drawGridLines() {
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cor-geogebra-grid').trim();
+            ctx.lineWidth = 1;
+
+            // Linhas Verticais
+            const startX = Math.floor((-offsetX) / scale / gridStep) * gridStep;
+            for (let x = startX; x * scale + offsetX < canvas.width; x += gridStep) {
+                const { px } = worldToScreen(x, 0);
+                ctx.beginPath();
+                ctx.moveTo(px, 0);
+                ctx.lineTo(px, canvas.height);
+                ctx.stroke();
+            }
+
+            // Linhas Horizontais
+            const startY = Math.floor((-offsetY) / scale / gridStep) * gridStep * -1;
+            for (let y = startY; y * scale - offsetY < canvas.height; y -= gridStep) {
+                const { py } = worldToScreen(0, y);
+                ctx.beginPath();
+                ctx.moveTo(0, py);
+                ctx.lineTo(canvas.width, py);
+                ctx.stroke();
+            }
+        }
+
+        /**
+         * Desenha APENAS os eixos X e Y.
+         */
+        function drawAxes() {
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cor-geogebra-eixos').trim();
+            ctx.lineWidth = 2;
+            
+            // Eixo Y
+            ctx.beginPath();
+            ctx.moveTo(offsetX, 0);
+            ctx.lineTo(offsetX, canvas.height);
+            ctx.stroke();
+
+            // Eixo X
+            ctx.beginPath();
+            ctx.moveTo(0, offsetY);
+            ctx.lineTo(canvas.width, offsetY);
+            ctx.stroke();
+        }
+
         /**
          * Converte coordenadas do canvas (px, py) para coordenadas do mundo (x, y).
          */
         function screenToWorld(px, py) {
             const x = (px - offsetX) / scale;
-            const y = (offsetY - py) / scale; // Y é invertido no canvas
+            const y = (offsetY - py) / scale; 
             return { x, y };
         }
 
@@ -378,62 +494,14 @@
             const py = offsetY - y * scale;
             return { px, py };
         }
-
+        
         /**
-         * Desenha a malha quadriculada.
-         */
-        function drawGrid() {
-            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--cor-geogebra-bg').trim();
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // 1. Linhas da Malha (Grid) - AGORA MAIS VISÍVEL
-            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cor-geogebra-grid').trim();
-            ctx.lineWidth = 1;
-
-            const startX = Math.floor((-offsetX) / scale / gridStep) * gridStep;
-            for (let x = startX; x * scale + offsetX < canvas.width; x += gridStep) {
-                const { px } = worldToScreen(x, 0);
-                ctx.beginPath();
-                ctx.moveTo(px, 0);
-                ctx.lineTo(px, canvas.height);
-                ctx.stroke();
-            }
-
-            const startY = Math.floor((-offsetY) / scale / gridStep) * gridStep * -1;
-            for (let y = startY; y * scale - offsetY < canvas.height; y -= gridStep) {
-                const { py } = worldToScreen(0, y);
-                ctx.beginPath();
-                ctx.moveTo(0, py);
-                ctx.lineTo(canvas.width, py);
-                ctx.stroke();
-            }
-
-            // 2. Eixos (X e Y)
-            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cor-geogebra-eixos').trim();
-            ctx.lineWidth = 2;
-            
-            ctx.beginPath();
-            ctx.moveTo(offsetX, 0);
-            ctx.lineTo(offsetX, canvas.height);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(0, offsetY);
-            ctx.lineTo(canvas.width, offsetY);
-            ctx.stroke();
-
-            // 3. Desenho dos Objetos (Polígonos e Polilinhas)
-            drawObjects();
-        }
-
-        /**
-         * Desenha todos os objetos (polígonos e polilinhas) salvos.
+         * Desenha todos os objetos (polígonos e polilinhas) salvos e temporários.
          */
         function drawObjects() {
             // Desenha objetos permanentes
             objects.forEach(obj => {
                 if (obj.type === 'polygon' || obj.type === 'polyline') {
-                    // Contorno mais grosso (3px) e preenchimento semi-transparente
                     drawPolygonShape(obj.vertices, '#000000', 'rgba(0, 121, 107, 0.4)', 3);
                 }
             });
@@ -441,11 +509,9 @@
             // Desenha objeto temporário em construção
             if (tempObject) {
                 if (tempObject.type === 'polyline' && tempObject.vertices.length > 0) {
-                    // Linhas pontilhadas para o desenho livre temporário
                     drawPolygonShape(tempObject.vertices, 'var(--cor-ponto-ativo)', 'rgba(255, 0, 0, 0.1)', 2, true); 
                     tempObject.vertices.forEach(v => drawPoint(v.x, v.y, 6, 'var(--cor-ponto-ativo)'));
                 } else if (tempObject.type === 'polygon' && tempObject.step === 1) {
-                    // Ponto central do polígono regular
                     drawPoint(tempObject.center.x, tempObject.center.y, 8, 'var(--cor-ponto-ativo)');
                 }
             }
@@ -466,10 +532,8 @@
                 ctx.lineTo(point.px, point.py);
             }
 
-            // Para fechar a forma
             ctx.closePath(); 
             
-            // Estilo
             ctx.fillStyle = fillColor;
             ctx.fill();
 
@@ -493,19 +557,15 @@
         
         // --- FUNÇÕES DE INTERAÇÃO (Mouse/Teclado) ---
 
-        /**
-         * Ativa um modo de desenho e limpa o estado temporário.
-         */
         function activateDrawingMode(mode) {
             drawingMode = mode;
             tempObject = { type: mode };
             
-            // Limpa o botão de finalizar
             document.getElementById('finishPolylineButton').style.display = 'none';
 
             if (mode === 'polygon') {
                 tempObject.sides = parseInt(document.getElementById('polygon-sides').value);
-                tempObject.step = 1; // 1: definir centro, 2: definir raio
+                tempObject.step = 1; 
                 modeIndicator.textContent = `Modo: Polígono (${tempObject.sides} lados) - Clique no centro`;
             } else if (mode === 'polyline') {
                 tempObject.vertices = [];
@@ -513,16 +573,12 @@
             } else {
                 modeIndicator.textContent = `Modo: Normal`;
             }
-            drawGrid();
+            needsRedraw = true; 
         }
         
-        /**
-         * Trata o clique do mouse no canvas para adicionar pontos ou finalizar formas.
-         */
         function handleDrawingClick(e) {
             if (drawingMode === 'none') return;
 
-            // Obtém as coordenadas do mundo
             const rect = canvas.getBoundingClientRect();
             const clickPx = e.clientX - rect.left;
             const clickPy = e.clientY - rect.top;
@@ -536,26 +592,22 @@
                 handlePolylineClick(x, y);
             }
 
-            drawGrid();
+            needsRedraw = true; // Atualiza o estado para redesenhar
         }
         
         function handlePolygonClick(x, y) {
             if (tempObject.step === 1) {
-                // Passo 1: Definir Centro
                 tempObject.center = { x, y };
                 tempObject.step = 2;
                 modeIndicator.textContent = `Modo: Polígono - Clique para definir o raio (tamanho)`;
             } else if (tempObject.step === 2) {
-                // Passo 2: Definir Raio e Finalizar
                 const cx = tempObject.center.x;
                 const cy = tempObject.center.y;
                 const radius = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
                 const sides = tempObject.sides;
                 
-                // Calcula os vértices de um polígono regular
                 const vertices = [];
-                // Ajusta o ângulo inicial para que o polígono fique "reto" no topo/fundo
-                const initialAngle = -Math.PI / 2; // Começa no topo
+                const initialAngle = -Math.PI / 2;
                 for (let i = 0; i < sides; i++) {
                     const angle = initialAngle + i * (2 * Math.PI / sides);
                     const vx = cx + radius * Math.cos(angle);
@@ -569,7 +621,6 @@
         }
         
         function handlePolylineClick(x, y) {
-            // Adiciona o novo vértice à forma temporária
             tempObject.vertices.push({ x, y });
             
             if (tempObject.vertices.length >= 2) {
@@ -580,13 +631,12 @@
 
         function finalizePolyline() {
             if (tempObject && tempObject.type === 'polyline' && tempObject.vertices.length >= 3) {
-                // Salva a polilinha como um objeto permanente
                 objects.push(tempObject); 
                 activateDrawingMode('none');
             } else if (tempObject && tempObject.type === 'polyline') {
                  alert("Precisa de pelo menos 3 pontos para formar uma forma fechada.");
             }
-            drawGrid();
+            needsRedraw = true; // Atualiza o estado para redesenhar
         }
 
         /**
@@ -607,7 +657,7 @@
             
             scale = Math.max(5, Math.min(100, scale)); 
 
-            drawGrid();
+            needsRedraw = true; // Atualiza o estado para redesenhar
         }
 
         /**
@@ -642,30 +692,24 @@
 
             if (moved) {
                 e.preventDefault(); 
-                drawGrid();
+                needsRedraw = true; // Atualiza o estado para redesenhar
             }
         }
 
-        /**
-         * FIX: Altera a aba de cálculo no painel lateral.
-         * Usa e.currentTarget para garantir que o data-tab seja lido, mesmo que o clique seja no <i>.
-         */
         function switchTab(e) {
-            // e.currentTarget é o botão <button> que possui o atributo data-tab
             const targetTab = e.currentTarget.dataset.tab;
             
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            e.currentTarget.classList.add('active'); // Usa e.currentTarget
+            e.currentTarget.classList.add('active'); 
 
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(`tab-${targetTab}`).classList.add('active');
             
-            // Ao mudar de aba, volta para o modo normal de desenho
             activateDrawingMode('none');
         }
 
 
-        // --- FUNÇÕES DE CÁLCULO (Sidebar - Mantidas) ---
+        // --- FUNÇÕES DE CÁLCULO (Sidebar) ---
 
         function round(value) {
             return Math.round(value * 100) / 100;
@@ -722,7 +766,37 @@
                 document.getElementById('res-thales').textContent = '0';
             }
         }
+        
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            
+            setTimeout(() => {
+                try {
+                    // 1. Inicializa o Canvas e inicia o Loop de Animação
+                    initCanvas();
+                    
+                    // 2. Adiciona todos os listeners de eventos
+                    canvas.addEventListener('wheel', handleZoom);
+                    window.addEventListener('keydown', handlePan);
+                    canvas.addEventListener('mousedown', handleDrawingClick);
+                    
+                    document.querySelectorAll('.tab-button').forEach(button => {
+                        button.addEventListener('click', switchTab);
+                    });
 
+                    document.body.focus();
+                    
+                    // 3. Esconde a tela de loading
+                    loadingOverlay.classList.add('hidden');
+                    
+                } catch (error) {
+                    console.error("Erro fatal durante a inicialização: ", error);
+                    alert("Ocorreu um erro ao carregar o aplicativo. Verifique o console para detalhes.");
+                    loadingOverlay.classList.add('hidden'); 
+                }
+            }, 50); 
+        });
     </script>
 </body>
 </html>
