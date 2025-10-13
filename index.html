@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma Educacional</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <style>
         /* ----------------------------------- */
@@ -245,13 +246,30 @@
             box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.4);
         }
         
-        /* ESTILO PARA O ÍCONE DENTRO DO CARD */
+        /* ESTILO PARA O ÍCONE DENTRO DO CARD (Aplica-se a Font Awesome) */
         .card-icon {
             font-size: 3em; 
             margin-bottom: 10px; 
             color: #D2691E; 
         }
         
+        /* NOVO: Regras específicas para Material Symbols Outlined (sobrescreve o .card-icon para funcionar como fonte de ícones) */
+        .content-card .material-symbols-outlined {
+            /* Essencial para carregar a fonte corretamente */
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            line-height: 1;
+            white-space: nowrap;
+            direction: ltr;
+            /* Força as variações para garantir a aparência de ícone */
+            font-variation-settings: 
+              'FILL' 0,
+              'wght' 400,
+              'GRAD' 0,
+              'opsz' 48; 
+        }
+
         /* ESTILO PARA O TÍTULO DENTRO DO CARD */
         .card-title {
             text-align: center; 
@@ -516,7 +534,10 @@
                 </a>
                 <a href="gravitacao_universal.html" class="card-link" data-subject="fisica">
                     <div class="content-card">
-                       <i class="fa-regular fa-circle card-icon"></i> <p class="card-title">Gravitação Universal</p>
+                        <span class="material-symbols-outlined card-icon">
+                            orbit
+                        </span>
+                        <p class="card-title">Gravitação Universal</p>
                     </div>
                 </a>
             </div>
@@ -757,12 +778,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
