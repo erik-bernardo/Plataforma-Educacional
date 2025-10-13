@@ -82,7 +82,35 @@
             padding: 20px; 
         }
 
-        .logo-link { text-decoration: none; color: var(--cor-destaque); font-size: 18px; font-weight: bold; padding: 0 25px; display: flex; align-items: center; border-right: 1px solid #333; }
+        /* ----------------------------------- */
+        /* CSS do Componente LOGO-BOTÃO (Mesclado de logo.html e arco_angulo.html) */
+        /* ----------------------------------- */
+
+        .logo-link {
+            /* Estilo Base */
+            text-decoration: none; 
+            color: var(--cor-destaque); 
+            font-size: 18px;
+            font-weight: bold;
+            
+            /* Box Model e Layout */
+            padding: 0 25px; 
+            display: flex;
+            align-items: center; /* Centraliza verticalmente na altura da barra */
+            
+            /* Separador e Transição - Mantém o padrão escuro */
+            border-right: 1px solid #333; 
+            transition: background-color 0.3s;
+        }
+
+        .logo-link:hover {
+            background-color: #222222; /* Cor de hover adaptada ao tema escuro */
+        }
+
+        .logo-link .fas {
+            margin-right: 10px; /* Espaçamento do ícone */
+        }
+
         .page-title { padding: 0 25px; font-size: 16px; font-weight: bold; color: #ccc; display: flex; align-items: center; }
 
         /* ----------------------------------- */
@@ -241,7 +269,7 @@
 <body onload="initializeSimulation()">
 
     <header class="top-bar">
-        <a href="#" class="logo-link"><i class="fas fa-book-reader"></i> PLATAFORMA</a>
+        <a href="index.html" class="logo-link"><i class="fas fa-book-reader"></i> PLATAFORMA</a>
         <div class="nav-buttons">
             <span class="page-title">Simulador de Gravidade N-Corpos (v18 - Tutorial)</span>
         </div>
