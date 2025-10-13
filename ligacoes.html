@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Ligações Químicas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    
+    <style>
+        /* ----------------------------------- */
+        /* VARIÁVEIS E ESTILOS GERAIS */
+        /* ----------------------------------- */
+        :root {
+            --sidebar-width: 400px;
+            --cor-primaria: #8e44ad; /* Roxo (Cor da Química) */
+            --cor-secundaria: #34495e; 
+            --cor-fundo: #f8f8f8;
+            --cor-fundo-card: #ffffff;
+            --cor-resultado: #e67e22; /* Laranja (Para o resultado) */
+            --cor-destaque-logo: #D2691E; /* Cor do Logo PLATAFORMA */
+            --header-height: 55px;
+
+            /* Cores Específicas das Ligações */
+            --cor-ionica: #e74c3c; /* Vermelho */
+            --cor-covalente: #2ecc71; /* Verde */
+            --cor-metalica: #3498db; /* Azul */
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--cor-secundaria);
+            display: flex; 
+            flex-direction: column;
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* ----------------------------------- */
+        /* LAYOUT PRINCIPAL (Sidebar + Content) */
+        /* ----------------------------------- */
+        .main-content-wrapper {
+            display: flex;
+            flex-grow: 1; 
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .controls-panel {
+            width: var(--sidebar-width); 
+            height: 100%;
+            overflow-y: auto; 
+            background-color: var(--cor-fundo);
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box; 
+            flex-shrink: 0;
+        }
+        
+        .result-panel {
+            flex-grow: 1; 
+            background-color: var(--cor-fundo-card);
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        /* BARRA SUPERIOR (Adaptado) */
+        .top-bar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: var(--header-height);
+            flex-shrink: 0;
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid #ddd;
+        }
+        .logo-link {
+            text-decoration: none;
+            color: var(--cor-destaque-logo); 
+            font-size: 18px;
+            font-weight: bold;
+            padding: 0 25px; 
+            display: flex;
+            align-items: center; 
+            border-right: 1px solid #ddd; 
+        }
+        .nav-button {
+            background: none;
+            border: none;
+            padding: 15px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+        }
+
+
+        /* ----------------------------------- */
+        /* CONTROLES E INPUTS */
+        /* ----------------------------------- */
+        h1 {
+            color: var(--cor-primaria);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #ffffff;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--cor-secundaria);
+        }
+
+        .input-group input[type="number"], .input-group select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1.1em;
+            box-sizing: border-box;
+        }
+        
+        .input-group span {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--cor-primaria);
+            margin-left: 5px;
+        }
+        
+        /* ----------------------------------- */
+        /* ÁREA DE RESULTADOS */
+        /* ----------------------------------- */
+
+        .result-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f4f9fc;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--cor-resultado);
+        }
+
+        .result-section h2 {
+            color: var(--cor-resultado);
+            margin-top: 0;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .result-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+            word-break: break-all;
+            padding: 10px 0;
+        }
+        
+        .result-value.ionica { color: var(--cor-ionica); }
+        .result-value.covalente { color: var(--cor-covalente); }
+        .result-value.metalica { color: var(--cor-metalica); }
+        
+        .result-explanation {
+            text-align: center;
+            font-style: italic;
+            color: #777;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        
+        .error-message {
+            color: #c0392b;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        /* ESTILOS DO PASSO A PASSO */
+        .step-by-step-box {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .step-line {
+            padding: 8px 0;
+            font-size: 1.05em;
+        }
+        .step-line .highlight {
+            font-weight: bold;
+            color: var(--cor-primaria);
+            background-color: #f7f0ff;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .table-criteria {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .table-criteria th, .table-criteria td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .table-criteria th {
+            background-color: #ecf0f1;
+            color: var(--cor-secundaria);
+        }
+        .table-criteria .ionica { background-color: #fdd; color: var(--cor-ionica); font-weight: bold;}
+        .table-criteria .covalente { background-color: #dff; color: var(--cor-covalente); font-weight: bold;}
+        .table-criteria .polar { background-color: #ffc; font-weight: bold;}
+        .table-criteria .apolar { background-color: #eee; font-weight: bold;}
+
+
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <a href="index.html" class="logo-link">
+            <i class="fas fa-book-reader"></i> PLATAFORMA
+        </a>
+
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-button"><i class="fas fa-arrow-up"></i> MATÉRIAS</a>
+            <a href="exercicios_index.html" class="nav-button"><i class="fas fa-arrow-down"></i> EXE. DE APOIO</a>
+            <a href="videoaula_index.html" class="nav-button"><i class="fas fa-arrow-down"></i> VIDEO AULA</a>
+            
+            <button class="nav-button more-options">...</button>
+        </div>
+    </header>
+
+    <div class="main-content-wrapper">
+        
+        <div class="controls-panel">
+            <h1><i class="fas fa-atom"></i> Simulador de Ligações Químicas</h1>
+            
+            <div id="operation-content" class="tab-content">
+                <h3>Critério da Diferença de Eletronegatividade ($\Delta E$)</h3>
+
+                <div class="input-group">
+                    <label for="electroneg_1">Eletronegatividade do Elemento 1:</label>
+                    <input type="number" id="electroneg_1" min="0" max="4" step="0.01" value="0.9" oninput="calculateBondType()">
+                    <div class="input-explanation">Exemplo: Sódio (Na) = 0.9 (Pauling)</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="electroneg_2">Eletronegatividade do Elemento 2:</label>
+                    <input type="number" id="electroneg_2" min="0" max="4" step="0.01" value="3.5" oninput="calculateBondType()">
+                    <div class="input-explanation">Exemplo: Oxigênio (O) = 3.5 (Pauling)</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="metallic_check">Forçar Ligação Metálica?</label>
+                    <input type="checkbox" id="metallic_check" onchange="calculateBondType()">
+                    <div class="input-explanation">Marque se ambos os elementos são metais (ex: Cobre + Zinco).</div>
+                </div>
+
+                <button class="nav-button" onclick="calculateBondType()" style="width: 100%; background-color: var(--cor-primaria); color: white; margin-top: 10px;">
+                    <i class="fas fa-flask"></i> IDENTIFICAR LIGAÇÃO
+                </button>
+            </div>
+
+        </div>
+
+        <div id="result-container" class="result-panel">
+            <div class="result-section">
+                <h2>Aguardando Valores</h2>
+                <p>Insira as eletronegatividades dos dois elementos ou marque a opção Metálica para identificar o tipo de ligação química resultante.</p>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        
+        /** Função principal de cálculo e exibição */
+        function calculateBondType() {
+            const container = document.getElementById('result-container');
+            let valid = true;
+            let errorMsg = '';
+            
+            const EN1 = parseFloat(document.getElementById('electroneg_1').value);
+            const EN2 = parseFloat(document.getElementById('electroneg_2').value);
+            const isMetallic = document.getElementById('metallic_check').checked;
+
+            // 1. Validação
+            if (isNaN(EN1) || isNaN(EN2) || EN1 < 0 || EN2 < 0 || EN1 > 4 || EN2 > 4) {
+                valid = false;
+                errorMsg = 'Valores de eletronegatividade inválidos. Use números entre 0 e 4.';
+            }
+
+            let resultBond = '';
+            let explanation = '';
+            let deltaEN = 0;
+            let resultClass = '';
+
+            if (valid) {
+                // 2. Cálculo da Diferença de Eletronegatividade
+                deltaEN = Math.abs(EN1 - EN2);
+                
+                // 3. Classificação
+                if (isMetallic) {
+                    resultBond = 'Ligação Metálica';
+                    explanation = 'A ligação ocorre entre dois átomos de Metal, caracterizada pela nuvem de elétrons.';
+                    resultClass = 'metalica';
+
+                } else if (deltaEN >= 1.7) {
+                    resultBond = 'Ligação Iônica';
+                    explanation = 'A diferença de eletronegatividade (ΔE) é alta, resultando em transferência de elétrons (formação de íons).';
+                    resultClass = 'ionica';
+
+                } else if (deltaEN > 0.4) {
+                    resultBond = 'Ligação Covalente Polar';
+                    explanation = 'A diferença de eletronegatividade (ΔE) é intermediária, causando compartilhamento desigual de elétrons.';
+                    resultClass = 'covalente';
+                    
+                } else if (deltaEN <= 0.4) {
+                    resultBond = 'Ligação Covalente Apolar';
+                    explanation = 'A diferença de eletronegatividade (ΔE) é muito baixa ou zero, resultando em compartilhamento uniforme de elétrons.';
+                    resultClass = 'covalente';
+                } else {
+                     // Caso residual (nunca deve acontecer com a lógica acima)
+                    resultBond = 'Ligação Desconhecida';
+                    explanation = 'Não foi possível classificar com os critérios atuais.';
+                    resultClass = '';
+                }
+
+                // 4. Geração do Passo a Passo e Tabela
+                const stepByStepHtml = buildStepByStep(EN1, EN2, deltaEN, isMetallic);
+
+                // 5. HTML Final
+                container.innerHTML = `
+                    <div class="result-section">
+                        <h2><i class="fas fa-vial"></i> Resultado da Ligação</h2>
+                        <div class="result-explanation">Entre $E_{1}$ = ${EN1.toFixed(2).replace('.', ',')} e $E_{2}$ = ${EN2.toFixed(2).replace('.', ',')}</div>
+                        <div class="result-value ${resultClass}">
+                            ${resultBond}
+                        </div>
+                        <p style="text-align: center; color: var(--cor-secundaria); font-weight: bold;">${explanation}</p>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h2><i class="fas fa-brain"></i> Como o Tipo de Ligação é Determinado?</h2>
+                        ${stepByStepHtml}
+                    </div>
+                `;
+
+            } else {
+                 container.innerHTML = `
+                    <div class="result-section">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Erro de Entrada</h2>
+                        <div class="error-message">${errorMsg}</div>
+                    </div>
+                `;
+            }
+
+            // Renderiza as fórmulas MathJax
+            MathJax.typesetPromise([container]).catch((err) => console.error("MathJax error:", err));
+        }
+
+        /** Constrói o passo a passo da fórmula e tabela de critérios. */
+        function buildStepByStep(EN1, EN2, deltaEN, isMetallic) {
+            
+            const steps = `
+                <p><strong>1. Critério Inicial (Tipo de Átomos):</strong></p>
+                <div class="step-line">
+                    Se ambos os átomos são <span class="highlight">Metais</span>, a ligação é classificada diretamente como <span style="color: var(--cor-metalica); font-weight: bold;">Metálica</span>. (Status: ${isMetallic ? 'SIM' : 'NÃO'}).
+                </div>
+
+                <p><strong>2. Cálculo da Diferença de Eletronegatividade ($\Delta E$):</strong></p>
+                <div class="step-line">
+                    $$\\Delta E = | E_{1} - E_{2} | = | ${EN1.toFixed(2).replace('.', ',')} - ${EN2.toFixed(2).replace('.', ',')} | = \\text{${deltaEN.toFixed(2).replace('.', ',')}}$$
+                </div>
+                
+                <p><strong>3. Aplicação do Critério de Classificação (Escala de Pauling):</strong></p>
+                
+                <table class="table-criteria">
+                    <thead>
+                        <tr>
+                            <th>Condição</th>
+                            <th>Tipo de Ligação</th>
+                            <th>Natureza</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="${deltaEN >= 1.7 ? 'ionica' : ''}">
+                            <td>$\\Delta E \\geq 1.7$</td>
+                            <td>Iônica</td>
+                            <td>Transferência de Elétrons</td>
+                        </tr>
+                        <tr class="${!isMetallic && (deltaEN > 0.4 && deltaEN < 1.7) ? 'polar' : ''}">
+                            <td>$0.4 < \\Delta E < 1.7$</td>
+                            <td>Covalente Polar</td>
+                            <td>Compartilhamento Desigual</td>
+                        </tr>
+                        <tr class="${!isMetallic && deltaEN <= 0.4 ? 'covalente' : ''}">
+                            <td>$\\Delta E \\leq 0.4$</td>
+                            <td>Covalente Apolar</td>
+                            <td>Compartilhamento Igual</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p style="margin-top: 15px;">**Conclusão:** O valor calculado de $\Delta E = \text{${deltaEN.toFixed(2).replace('.', ',')}}$ se enquadra na categoria de **${getBondDescription(deltaEN, isMetallic)}**.</p>
+            `;
+            
+            return `<div class="step-by-step-box">${steps}</div>`;
+        }
+        
+        function getBondDescription(deltaEN, isMetallic) {
+            if (isMetallic) return 'Ligação Metálica';
+            if (deltaEN >= 1.7) return 'Ligação Iônica';
+            if (deltaEN > 0.4) return 'Ligação Covalente Polar';
+            return 'Ligação Covalente Apolar';
+        }
+
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateBondType(); // Roda o cálculo inicial com os valores padrão
+        });
+
+    </script>
+</body>
+</html>
