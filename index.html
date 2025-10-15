@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma Educacional</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <style>
         /* ----------------------------------- */
@@ -246,30 +246,13 @@
             box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.4);
         }
         
-        /* ESTILO PARA O ÍCONE DENTRO DO CARD (Aplica-se a Font Awesome) */
+        /* ESTILO PARA O ÍCONE DENTRO DO CARD */
         .card-icon {
             font-size: 3em; 
             margin-bottom: 10px; 
             color: #D2691E; 
         }
         
-        /* NOVO: Regras específicas para Material Symbols Outlined (sobrescreve o .card-icon para funcionar como fonte de ícones) */
-        .content-card .material-symbols-outlined {
-            /* Essencial para carregar a fonte corretamente */
-            font-family: 'Material Symbols Outlined';
-            font-weight: normal;
-            font-style: normal;
-            line-height: 1;
-            white-space: nowrap;
-            direction: ltr;
-            /* Força as variações para garantir a aparência de ícone */
-            font-variation-settings: 
-              'FILL' 0,
-              'wght' 400,
-              'GRAD' 0,
-              'opsz' 48; 
-        }
-
         /* ESTILO PARA O TÍTULO DENTRO DO CARD */
         .card-title {
             text-align: center; 
@@ -328,7 +311,7 @@
             <hr class="divider">
             
             <div class="card-container-wrapper">
-                <a href="geometria_plana.html" class="card-link" data-subject="matematica">
+                <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
                         <i class="fas fa-chart-area card-icon"></i> <p class="card-title">Geometria Plana</p>
                     </div>
@@ -338,7 +321,7 @@
                         <i class="fas fa-calculator card-icon"></i> <p class="card-title">Conjuntos Numéricos</p>
                     </div>
                 </a>
-                <a href="funcoes.html" class="card-link" data-subject="matematica">
+                <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
                         <i class="fas fa-line-chart card-icon"></i> <p class="card-title">Função Afim e Quadrática</p>
                     </div>
@@ -348,12 +331,12 @@
                         <i class="fas fa-drafting-compass card-icon"></i> <p class="card-title">Arcos e Ângulos</p>
                     </div>
                 </a>
-                <a href="50-30-20.html" class="card-link" data-subject="matematica financeira">
+                <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
-                   <i class="fa-solid fa-wallet card-icon"></i> <p class="card-title">Gasto mensal ideal</p>
+                        <i class="fas fa-sort-numeric-up-alt card-icon"></i> <p class="card-title">Sequências Iniciais</p>
                     </div>
                 </a>
-                <a href="juros_simples.html" class="card-link" data-subject="matematica financeira">
+                <a href="#" class="card-link" data-subject="matematica financeira">
                     <div class="content-card">
                         <i class="fas fa-coins card-icon"></i> <p class="card-title">Juros Simples</p>
                     </div>
@@ -532,12 +515,9 @@
                         <i class="fas fa-faucet card-icon"></i> <p class="card-title">Hidrostática</p>
                     </div>
                 </a>
-                <a href="gravitacao_universal.html" class="card-link" data-subject="fisica">
+                <a href="termodinamica.html" class="card-link" data-subject="fisica">
                     <div class="content-card">
-                        <span class="material-symbols-outlined card-icon">
-                            orbit
-                        </span>
-                        <p class="card-title">Gravitação Universal</p>
+                        <i class="fas fa-cogs card-icon"></i> <p class="card-title">Termodinâmica</p>
                     </div>
                 </a>
             </div>
@@ -548,32 +528,32 @@
             <hr class="divider">
             
             <div class="card-container-wrapper">
-                <a href="calculos_limites.html" class="card-link" data-subject="matematica">
+                <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
                         <i class="fas fa-infinity card-icon"></i> <p class="card-title">Cálculo e Limites</p>
                     </div>
                 </a>
-                <a href="numeros_complexos.html" class="card-link" data-subject="matematica">
+                <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
                         <i class="fas fa-divide card-icon"></i> <p class="card-title">Números Complexos</p>
                     </div>
                 </a>
-                <a href="polinomios.html" class="card-link" data-subject="matematica">
+                <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
                         <i class="fas fa-superscript card-icon"></i> <p class="card-title">Polinômios</p>
                     </div>
                 </a>
-                 <a href="conicas.html" class="card-link" data-subject="matematica">
+                 <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
                         <i class="fas fa-circle card-icon"></i> <p class="card-title">Cônicas</p>
                     </div>
                 </a>
-                <a href="estatistica.html" class="card-link" data-subject="matematica">
+                <a href="#" class="card-link" data-subject="matematica">
                     <div class="content-card">
                         <i class="fas fa-chart-bar card-icon"></i> <p class="card-title">Estatística Avançada</p>
                     </div>
                 </a>
-                <a href="organica.html" class="card-link" data-subject="quimica">
+                <a href="#" class="card-link" data-subject="quimica">
                     <div class="content-card">
                         <i class="fas fa-flask card-icon"></i> <p class="card-title">Orgânica</p>
                     </div>
@@ -623,7 +603,7 @@
                         <i class="fas fa-eye card-icon"></i> <p class="card-title">Óptica Geométrica</p>
                     </div>
                 </a>
-                <a href="juros_compostos.html" class="card-link" data-subject="matematica financeira">
+                <a href="#" class="card-link" data-subject="matematica financeira">
                     <div class="content-card">
                         <i class="fas fa-chart-line card-icon"></i> <p class="card-title">Juros Compostos</p>
                     </div>
@@ -776,5 +756,4 @@
         });
     </script>
 </body>
-
 </html>
