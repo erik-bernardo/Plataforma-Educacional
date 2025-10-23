@@ -3,1101 +3,542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Geométrico Orbital V23.0 - Destaque Trigonométrico</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+    <title>Círculo Trigonométrico (Versão Final)</title>
     <style>
-        /* ----------------------------------- */
-        /* ESTILOS GERAIS: ATIVA O SCROLL GLOBAL */
-        /* ----------------------------------- */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f9;
+        /* --- LAYOUT DE TELA CHEIA --- */
+        body, html {
             margin: 0;
             padding: 0;
-            color: #333;
-            display: flex; 
-            flex-direction: column; 
-            min-height: 100vh; 
-        }
-
-        /* Contentor principal: Ocupa o restante do espaço vertical */
-        .main-content-wrapper {
-            display: flex;
-            min-height: calc(100vh - 51px); 
             width: 100%;
-            overflow: visible; 
-        }
-        
-        /* ----------------------------------- */
-        /* BARRA SUPERIOR DE NAVEGAÇÃO (TOP-BAR) - Sem Alterações */
-        /* ----------------------------------- */
-        .top-bar {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 0;
-            margin-bottom: 0;
-            display: flex;
-            align-items: stretch; 
-            border-bottom: 1px solid #ddd; 
-            z-index: 1000; 
-            flex-shrink: 0; 
-        }
-        .logo-link {
-            text-decoration: none; color: #D2691E; font-size: 18px; font-weight: bold;
-            padding: 0 25px; display: flex; align-items: center; border-right: 1px solid #ddd; 
-            transition: background-color 0.3s;
-        }
-        .logo-link:hover { background-color: #f5f5f5; }
-        .logo-link .fas { margin-right: 10px; }
-        .nav-buttons { display: flex; }
-        .nav-button {
-            background: none; border: none; padding: 15px 20px; font-size: 14px;
-            font-weight: 500; color: #555; cursor: pointer; transition: background-color 0.3s, color 0.3s;
-            display: flex; align-items: center;
-        }
-        .nav-button i { margin-right: 8px; }
-        .nav-button.active { color: #3498db; border-bottom: 3px solid #3498db; }
-        .more-options { font-weight: bold; font-size: 18px; padding: 15px; }
-
-
-        /* ----------------------------------- */
-        /* PAINEL ESQUERDO: SCROLL REMOVIDO INTERNAMENTE */
-        /* ----------------------------------- */
-        .left-panel {
-            flex: 0 0 350px;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column; 
-            overflow-y: visible; 
-            transition: width 0.3s;
-        }
-        
-        #fixed-header-controls {
-            flex-shrink: 0; 
-            margin-bottom: 15px; 
-        }
-
-        #points-list-wrapper { 
-            flex-grow: 1; 
-            overflow-y: hidden; /* Rolagem desativada */
-            min-height: 0; 
-            padding-right: 0; 
-        }
-        
-        /* Estilos menores do painel esquerdo */
-        .action-button { padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 1.05em; transition: background-color 0.3s; margin-top: 5px; margin-bottom: 10px; pointer-events: auto; }
-        .action-button i { margin-right: 5px; }
-        #drawCircleButton, #drawEllipseButton { background-color: #3498db; color: white; width: 48%; }
-        #drawCircleButton:hover, #drawEllipseButton:hover { background-color: #2980b9; }
-        #placePointButton { background-color: #e67e22; color: white; margin-top: 15px; width: 100%; margin-bottom: 0; }
-        #placePointButton:hover:not(:disabled) { background-color: #d35400; }
-        #placePointButton:disabled { background-color: #ccc; cursor: not-allowed; }
-        .button-group { display: flex; justify-content: space-between; }
-        .input-group { margin-bottom: 10px; padding: 5px 0; border-top: 1px solid #eee; }
-        .input-field { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 1.0em; }
-        .point-config-item { border: 2px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 6px; background-color: #f9f9f9; }
-        .point-header { display: flex; align-items: center; margin-bottom: 10px; }
-        .point-header span { font-weight: bold; margin-left: 10px; }
-        .point-color-indicator { width: 15px; height: 15px; border-radius: 50%; border: 3px solid #333; }
-        .point-input-row { display: flex; gap: 10px; margin-top: 8px; }
-        .point-input-row label { flex: 1; font-size: 0.9em; }
-        
-        #simulateAllButton {
-            background-color: #2ecc71; color: white; padding: 15px; border: none;
-            border-radius: 4px; cursor: pointer; font-size: 1.2em;
-            transition: background-color 0.3s; 
-            margin-top: 15px; 
-            margin-bottom: 0; 
-            width: 100%;
-            flex-shrink: 0; 
-        }
-        #simulateAllButton:hover:not(:disabled) { background-color: #27ae60; }
-        #simulateAllButton:disabled { background-color: #95a5a6; cursor: not-allowed; }
-        #mode-indicator { padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; text-align: center; border: 2px solid; background-color: #fcf8e3; color: #8a6d3b; border-color: #faebcc; }
-        .converter-section { border-top: 1px solid #ccc; padding-top: 15px; margin-top: 15px; }
-        .converter-section h4 { color: #1abc9c; }
-
-
-        /* ----------------------------------- */
-        /* CENTRO: ÁREA DE VISUALIZAÇÃO - Sem Alterações */
-        /* ----------------------------------- */
-        .simulation-area {
-            flex-grow: 1; position: relative; background-color: #e8eef3;
-            background-image: linear-gradient(to right, #ccc 1px, transparent 1px), linear-gradient(to bottom, #ccc 1px, transparent 1px);
-            background-size: 20px 20px; background-position: top left;
+            height: 100%;
             overflow: hidden; 
-        }
-        .shape { 
-            position: absolute; box-sizing: border-box; 
-            border: 2px solid #3498db !important; 
-            background-color: rgba(52, 152, 219, 0.1) !important; 
-            cursor: grab; z-index: 10;
-        }
-        .shape.ellipse, .shape.circle { border-radius: 50%; }
-
-        .shape.selected {
-            border: 3px dashed #e74c3c !important; 
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
-        }
-
-        .orbit-point {
-            width: 15px; height: 15px; border-radius: 50%;
-            position: absolute; transform: translate(-50%, -50%);
-            border: 3px solid #333; cursor: grab; z-index: 100;
-            pointer-events: auto; transition: border-color 0.1s;
-        }
-        .orbit-point.active { border-color: #f1c40f; }
-        #angle-announcement {
-            position: absolute; top: 10px; right: 10px; background-color: #f39c12; color: white;
-            padding: 10px 15px; border-radius: 4px; font-size: 1em; font-weight: bold; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); opacity: 0; visibility: hidden; 
-            transition: opacity 0.3s, visibility 0.3s; z-index: 101;
-        }
-        #angle-announcement.show { opacity: 1; visibility: visible; }
-        
-        /* ----------------------------------- */
-        /* PAINEL DIREITO: CÁLCULO DE ETAPAS - SCROLL REMOVIDO */
-        /* ----------------------------------- */
-        .right-panel {
-            flex: 0 0 350px;
-            max-width: 350px;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #fff;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column; 
-            transition: transform 0.3s ease-in-out;
-            position: relative; 
-            overflow: visible; 
         }
-        .right-panel.collapsed {
-            transform: translateX(350px);
-        }
-        
-        #calc-steps-content {
-            flex-grow: 1; 
-            overflow-y: hidden; /* Rolagem desativada */
-            min-height: 0; 
-        }
-        .toggle-button {
-            position: absolute; left: -30px; top: 50%; transform: translateY(-50%);
-            background-color: #3498db; color: white; border: none; padding: 8px 5px;
-            border-radius: 4px 0 0 4px; cursor: pointer; z-index: 10; transition: background-color 0.3s;
-        }
-        .toggle-button:hover { background-color: #2980b9; }
-        .calc-step-item { border-bottom: 1px solid #eee; padding: 10px 0; }
-        .calc-step-header { cursor: pointer; font-weight: bold; color: #34495e; display: flex; justify-content: space-between; align-items: center; }
-        .calc-step-header i { margin-left: 10px; transition: transform 0.3s; }
-        .calc-step-content { display: none; padding: 5px 0 0 15px; font-size: 0.9em; line-height: 1.5; color: #555; }
-        .calc-step-header.open i { transform: rotate(90deg); }
-        .formula { font-style: italic; color: #e74c3c; margin-top: 5px; }
 
-        /* NOVO ESTILO: DESTAQUE PARA RESULTADO TRIGONOMÉTRICO */
-        .trigonometric-result {
-            border: 2px solid #2ecc71; /* Cor da borda verde */
-            background-color: #e8f8f5; /* Fundo mais claro */
-            padding: 10px;
-            margin: 15px 0;
-            border-radius: 6px;
+        #circuloTrig {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1; 
         }
-        .trigonometric-result p {
-            margin: 5px 0;
-            font-size: 1em;
-            color: #27ae60;
+
+        /* --- PAINÉIS DE INTERFACE --- */
+        .controls-panel {
+            position: fixed; 
+            top: 20px;
+            width: 300px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(5px); 
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            z-index: 10; 
+            overflow-y: auto;
+            max-height: calc(100vh - 40px); 
         }
-        .trigonometric-result strong {
+        .controls-panel.right { right: 20px; }
+        .controls-panel.left { left: 20px; width: 320px; }
+        /* --- FIM DO LAYOUT --- */
+
+        h2 {
+            text-align: left;
             color: #333;
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
         }
         
+        /* --- ESTILOS DO PAINEL DA DIREITA --- */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+        .input-group input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .toggle-group {
+            display: flex; align-items: center; margin-bottom: 20px;
+            padding: 10px; background-color: #f4f4f4; border-radius: 4px;
+        }
+        .toggle-group input { width: auto; margin-right: 10px; flex-shrink: 0; }
+        .toggle-group label { margin: 0; font-weight: 500; font-size: 0.95em; color: #333; cursor: pointer; }
+        .results { border-top: 1px solid #eee; padding-top: 15px; }
+        .results p {
+            margin: 12px 0; font-size: 1em; display: flex; justify-content: space-between;
+            font-family: "Courier New", Courier, monospace; /* Melhor para frações */
+        }
+        .results strong { color: #000; font-family: Arial, sans-serif; }
+        .pos { color: #27ae60; font-weight: bold; }
+        .neg { color: #e74c3c; font-weight: bold; }
+        .zero { color: #3498db; font-weight: bold; }
+        .undef { color: #95a5a6; font-weight: bold; }
+
+        
+        /* --- NOVOS ESTILOS DO PAINEL DA ESQUERDA --- */
+        .converter-group {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .converter-group h4 { margin-top: 0; margin-bottom: 10px; color: #555; font-size: 1.1em; }
+        .converter-row { display: flex; align-items: center; margin-bottom: 5px; }
+        .converter-row input {
+            font-size: 0.9em; padding: 8px;
+            border: 1px solid #ccc; border-radius: 4px;
+        }
+        .converter-row input[type="text"] { background-color: #eee; }
+        .converter-row span { margin: 0 8px; font-weight: bold; font-size: 1.1em; }
+        
+        /* Estilo para a linha do resultado em fração Pi */
+        .converter-row-frac {
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #3498db;
+            padding-left: 20px;
+        }
+        .converter-row-frac span { margin: 0 5px; }
+        
+        /* Estilo para a entrada fracionária Pi */
+        .frac-input input { width: 50px; text-align: center; }
+        .frac-input span { margin: 0 5px; }
+        .frac-input .divider {
+            display: inline-block;
+            border-top: 2px solid #333;
+            width: 20px;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+        
+        /* Tabela de Ângulos Notáveis */
+        .trig-table {
+            width: 100%; border-collapse: collapse; font-size: 0.9em; margin-top: 10px;
+        }
+        .trig-table th, .trig-table td {
+            border: 1px solid #ddd; padding: 6px; text-align: center;
+            font-family: "Courier New", Courier, monospace;
+        }
+        .trig-table th { background-color: #f4f4f4; font-family: Arial, sans-serif; }
     </style>
 </head>
 <body>
+
+    <canvas id="circuloTrig"></canvas>
     
-    <header class="top-bar">
-        <a href="index.html" class="logo-link">
-            <i class="fas fa-book-reader"></i> PLATAFORMA
-        </a>
-
-        <div class="nav-buttons">
-            <button class="nav-button active"><i class="fas fa-arrow-up"></i> MATÉRIAS</button>
-            <button class="nav-button"><i class="fas fa-arrow-down"></i> EXE. DE APOIO</button>
-            <button class="nav-button"><i class="fas fa-arrow-down"></i> VIDEO AULA</button>
-            <button class="nav-button more-options">...</button>
-        </div>
-    </header>
-
-    <div class="main-content-wrapper">
-
-        <div class="left-panel">
-            
-            <div id="fixed-header-controls">
-                <h2 style="color: #3498db;"><i class="fas fa-drafting-compass"></i> Laboratório Geométrico</h2>
-
-                <div class="converter-section">
-                    <h4 style="color: #1abc9c;"><i class="fas fa-exchange-alt"></i> Conversor de Ângulo</h4>
-                    <div class="input-group" style="border-top: none;">
-                        <label for="degInput">Graus (°):</label>
-                        <input type="number" id="degInput" class="input-field" placeholder="Ex: 180" value="0">
-                    </div>
-                    <div class="input-group">
-                        <label for="radOutput">Radianos (rad):</label>
-                        <input type="text" id="radOutput" class="input-field" placeholder="Resultado: 0.000 rad (≈ 0)" readonly>
-                    </div>
-                </div>
-                
-                <div id="mode-indicator">
-                    Modo: <span id="currentModeText">SELECIONE UMA AÇÃO</span>
-                </div>
-
-                <h4 style="margin-top: 0;"><i class="fas fa-shapes"></i> Criar Forma (Clique, depois Arraste)</h4>
-                <div class="button-group">
-                    <button id="drawCircleButton" class="action-button">
-                        <i class="far fa-circle"></i> Círculo
-                    </button>
-                    <button id="drawEllipseButton" class="action-button">
-                        <i class="far fa-ellipsis-h"></i> Elipse
-                    </button>
-                </div>
-
-                <h4 style="margin-top: 15px; margin-bottom: 5px;"><i class="fas fa-bullseye"></i> Colocar Ponto Orbital</h4>
-                <button id="placePointButton" class="action-button" disabled>
-                    Colocar Ponto Orbital
-                </button>
-            </div>
-            <h4 style="color: #e74c3c; margin-bottom: 5px; margin-top: 0;"><i class="fas fa-satellite-dish"></i> Pontos Orbitais Ativos</h4>
-            
-            <div id="points-list-wrapper">
-                
-                <div id="points-control-container">
-                    <p style="font-size: 0.9em; color: #999;">Crie um ponto orbital para começar.</p>
-                </div>
-                
-            </div>
-            
-            <button id="simulateAllButton" class="action-button" disabled>
-                <i class="fas fa-play-circle"></i> SIMULAR TODOS
-            </button>
-            
-        </div>
-
-        <div id="simulationArea" class="simulation-area">
-            <div id="previewPoint" class="preview-point" style="display: none;"></div>
-            
-            <div id="angle-announcement"></div>
-        </div>
+    <div class="controls-panel left">
+        <h2>Ferramentas</h2>
         
-        <div id="calcStepsPanel" class="right-panel">
-            <button id="toggleCalcButton" class="toggle-button">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <h2 style="color: #3498db; margin-top: 0;"><i class="fas fa-calculator"></i> Cálculo de Etapas</h2>
-            
-            <div id="calc-steps-content">
-                <p style="font-size: 0.9em; color: #999;">Os resultados detalhados dos cálculos trigonométricos aparecerão aqui após a simulação.</p>
+        <div class="converter-group">
+            <h4>Graus para Radianos</h4>
+            <div class="converter-row">
+                <input type="number" id="conv_deg_in" value="135" style="width: 80px;"> <span>°</span>
+                <span>=</span>
+                <input type="text" id="conv_rad_out" readonly style="width: 100px;"> <span>rad</span>
+            </div>
+            <div class="converter-row-frac">
+                <span>&asymp;</span> <span id="conv_rad_frac_out">3&pi;/4</span>
             </div>
         </div>
-        
-    </div> <script>
-        // ----------------- Variáveis Globais de Estado e Constantes -----------------
+
+        <div class="converter-group">
+            <h4>Radianos (Fração) para Graus</h4>
+            <div class="converter-row frac-input">
+                <input type="number" id="conv_rad_num" value="3">
+                <span>&pi;</span>
+                <span class="divider"></span>
+                <input type="number" id="conv_rad_den" value="4">
+                <span>=</span>
+                <input type="text" id="conv_deg_out" readonly style="width: 100px;"> <span>°</span>
+            </div>
+        </div>
+
+        <div class="converter-group">
+            <h4>Ângulos Notáveis (0° - 90°)</h4>
+            <table class="trig-table">
+                <thead>
+                    <tr>
+                        <th>°</th>
+                        <th>rad</th>
+                        <th>Seno</th>
+                        <th>Cosseno</th>
+                        <th>Tangente</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0°</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>30°</td>
+                        <td>π/6</td>
+                        <td>1/2</td>
+                        <td>&radic;3/2</td>
+                        <td>&radic;3/3</td>
+                    </tr>
+                    <tr>
+                        <td>45°</td>
+                        <td>π/4</td>
+                        <td>&radic;2/2</td>
+                        <td>&radic;2/2</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>60°</td>
+                        <td>π/3</td>
+                        <td>&radic;3/2</td>
+                        <td>1/2</td>
+                        <td>&radic;3</td>
+                    </tr>
+                    <tr>
+                        <td>90°</td>
+                        <td>π/2</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>&infin;</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="controls-panel right">
+        <h2>Análise Trigonométrica</h2>
+    
+        <div class="input-group">
+            <label for="anguloInput">Digite o Ângulo (°):</label>
+            <input type="number" id="anguloInput" value="135" placeholder="Ex: 45, -30, 400..." oninput="atualizarTudo()">
+        </div>
+
+        <div class="toggle-group">
+            <input type="checkbox" id="showRefAngle" onchange="atualizarTudo()" checked>
+            <label for="showRefAngle">Mostrar ângulo de referência (1ºQ)</label>
+        </div>
+
+        <div class="results">
+            <p><strong>Ângulo Norm.:</strong> <span id="angNormOutput">-</span></p>
+            <p><strong>Quadrante:</strong> <span id="quadranteOutput">-</span></p>
+            <hr>
+            <p><strong>Seno (sin):</strong> <span id="senoOutput">-</span></p>
+            <p><strong>Cosseno (cos):</strong> <span id="cossenoOutput">-</span></p>
+            <p><strong>Tangente (tan):</strong> <span id="tangenteOutput">-</span></p>
+        </div>
+    </div>
+
+    <script>
+        // --- Constantes Globais ---
         const PI = Math.PI;
+        // Valores Notáveis (para Request 1)
+        const VAL_SIN_30 = "1/2", VAL_COS_30 = "&radic;3/2", VAL_TAN_30 = "&radic;3/3";
+        const VAL_SIN_45 = "&radic;2/2", VAL_COS_45 = "&radic;2/2", VAL_TAN_45 = "1";
+        const VAL_SIN_60 = "&radic;3/2", VAL_COS_60 = "1/2", VAL_TAN_60 = "&radic;3";
         
-        let currentMode = 'IDLE'; 
-        let shapes = []; 
-        let orbitingPoints = []; 
-        let startX = 0, startY = 0; 
-        let isDrawingNewShape = false; 
-        let activeShape = null; 
-        let activePoint = null; 
-        let isDraggingPoint = false;
-        let isMovingShape = false; 
-        let isAnimating = false;
-        let selectedShape = null; 
+        // Cores
+        const COR_SENO = '#e74c3c', COR_COSSENO = '#3498db', COR_TANGENTE = '#27ae60';
+        const COR_EIXOS = '#ccc', COR_CIRCULO = '#333', COR_RAIO = '#555', COR_REFERENCIA = 'rgba(0, 0, 0, 0.4)';
 
-        // ----------------- Elementos DOM -----------------
-        const simulationArea = document.getElementById('simulationArea');
-        const modeIndicator = document.getElementById('mode-indicator');
-        const currentModeText = document.getElementById('currentModeText');
-        const placePointButton = document.getElementById('placePointButton');
-        const previewPoint = document.getElementById('previewPoint');
-        const angleAnnouncement = document.getElementById('angle-announcement');
-        const drawCircleButton = document.getElementById('drawCircleButton');
-        const drawEllipseButton = document.getElementById('drawEllipseButton');
-        const pointsControlContainer = document.getElementById('points-control-container'); 
-        const simulateAllButton = document.getElementById('simulateAllButton');
-        const calcStepsPanel = document.getElementById('calcStepsPanel');
-        const toggleCalcButton = document.getElementById('toggleCalcButton');
-        const calcStepsContent = document.getElementById('calc-steps-content');
+        // --- Elementos DOM (Painel Direito) ---
+        const input = document.getElementById('anguloInput');
+        const angNormOutput = document.getElementById('angNormOutput');
+        const quadranteOutput = document.getElementById('quadranteOutput');
+        const senoOutput = document.getElementById('senoOutput');
+        const cossenoOutput = document.getElementById('cossenoOutput');
+        const tangenteOutput = document.getElementById('tangenteOutput');
+        const showRefAngleCheckbox = document.getElementById('showRefAngle');
         
-        // Novos elementos do conversor
-        const degInput = document.getElementById('degInput');
-        const radOutput = document.getElementById('radOutput');
+        // --- Elementos DOM (Painel Esquerdo) ---
+        const conv_deg_in = document.getElementById('conv_deg_in');
+        const conv_rad_out = document.getElementById('conv_rad_out');
+        const conv_rad_frac_out = document.getElementById('conv_rad_frac_out'); // Novo
+        const conv_rad_num = document.getElementById('conv_rad_num'); // Novo
+        const conv_rad_den = document.getElementById('conv_rad_den'); // Novo
+        const conv_deg_out = document.getElementById('conv_deg_out');
 
+        // --- Configurações do Canvas ---
+        const canvas = document.getElementById('circuloTrig');
+        const ctx = canvas.getContext('2d');
+        let centerX, centerY, radius;
 
-        // ----------------- Funções de Utilitário e Geometria -----------------
+        // --- Funções Principais ---
 
-        function degToRad(deg) { return deg * (PI / 180); }
-        function radToDeg(rad) { return rad * (180 / PI); }
+        function atualizarTudo() {
+            const angUsuario = parseFloat(input.value) || 0;
+            const ang = (angUsuario % 360 + 360) % 360; 
+            const rad = ang * (PI / 180); 
+
+            atualizarResultadosTexto(angUsuario, ang, rad); 
+            
+            if (radius) {
+                desenharCanvas(ang, rad);
+            }
+        }
         
+        function handleResize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const painelEsquerdaLargura = 320 + 20; 
+            const painelDireitaLargura = 300 + 20; 
+            centerY = canvas.height / 2;
+            const x_start = painelEsquerdaLargura;
+            const x_end = canvas.width - painelDireitaLargura;
+            centerX = x_start + (x_end - x_start) / 2;
+            const espacoHorizontalDisponivel = x_end - x_start;
+            const raioHorizontal = (espacoHorizontalDisponivel / 2) * 0.8; 
+            const raioVertical = (canvas.height / 2) * 0.8; 
+            radius = Math.min(raioVertical, raioHorizontal);
+            if (radius < 0) radius = 0; 
+            atualizarTudo();
+        }
+
         /**
-         * Converte radianos para uma string fracionária de PI (ex: 3.14159 -> 1&pi;).
+         * Desenha o círculo trigonométrico (Sem alterações, idêntico à versão anterior)
          */
-        function radToPiString(rad) {
-            if (Math.abs(rad) < 1e-6) return '0';
-            const ratio = rad / PI;
-            for (let den = 1; den <= 60; den++) {
-                const num = Math.round(ratio * den);
-                if (Math.abs(num / den - ratio) < 1e-5) {
-                    if (num === 0) return '0';
-                    const sign = num < 0 ? '-' : '';
-                    const absNum = Math.abs(num);
-                    if (den === 1) return `${sign}${absNum === 1 ? '' : absNum}&pi;`;
-                    return `${sign}${absNum === 1 ? '' : absNum}&pi;/${den}`;
+        function desenharCanvas(angDeg, angRad) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 1. Eixos e Círculo Base
+            ctx.strokeStyle = COR_EIXOS; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(canvas.width, centerY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(centerX, 0); ctx.lineTo(centerX, canvas.height); ctx.stroke();
+            ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, 2 * PI); ctx.strokeStyle = COR_CIRCULO; ctx.lineWidth = 2; ctx.stroke();
+
+            // Reta da Tangente
+            const tanAxisX = centerX + radius;
+            ctx.beginPath(); ctx.moveTo(tanAxisX, 0); ctx.lineTo(tanAxisX, canvas.height);
+            ctx.strokeStyle = 'rgba(39, 174, 96, 0.5)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+            
+            // 2. Ângulo de Referência (Semelhante 1Q)
+            const showRef = showRefAngleCheckbox.checked;
+            let angRefDeg = 0;
+            if (angDeg > 90 && angDeg < 180) { angRefDeg = 180 - angDeg; }
+            else if (angDeg > 180 && angDeg < 270) { angRefDeg = angDeg - 180; }
+            else if (angDeg > 270 && angDeg < 360) { angRefDeg = 360 - angDeg; }
+
+            if (showRef && angRefDeg > 0) {
+                const angRefRad = angRefDeg * (PI / 180);
+                const refX = centerX + radius * Math.cos(angRefRad);
+                const refY = centerY - radius * Math.sin(angRefRad);
+                ctx.globalAlpha = 0.4; 
+                ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(refX, refY); 
+                ctx.strokeStyle = COR_RAIO; ctx.lineWidth = 2; ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(refX, centerY); 
+                ctx.strokeStyle = COR_COSSENO; ctx.lineWidth = 3; ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(refX, centerY); ctx.lineTo(refX, refY); 
+                ctx.strokeStyle = COR_SENO; ctx.lineWidth = 3; ctx.stroke();
+                ctx.beginPath(); ctx.arc(refX, refY, 5, 0, 2 * PI); 
+                ctx.fillStyle = COR_CIRCULO; ctx.fill();
+                ctx.beginPath(); ctx.arc(centerX, centerY, 30, 0, -angRefRad, true); 
+                ctx.strokeStyle = COR_REFERENCIA; ctx.lineWidth = 2; ctx.stroke();
+                ctx.font = 'bold 16px Arial'; 
+                ctx.fillStyle = COR_REFERENCIA;
+                ctx.fillText(`${angRefDeg.toFixed(1)}°`, refX + 10, refY - 10);
+                ctx.globalAlpha = 1.0; 
+            }
+
+            // 3. Ângulo Principal
+            const x = centerX + radius * Math.cos(angRad);
+            const y = centerY - radius * Math.sin(angRad); 
+
+            ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(x, centerY);
+            ctx.strokeStyle = COR_COSSENO; ctx.lineWidth = 3; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, centerY); ctx.lineTo(x, y);
+            ctx.strokeStyle = COR_SENO; ctx.lineWidth = 3; ctx.stroke();
+            
+            // 4. Tangente
+            if (angDeg !== 90 && angDeg !== 270) {
+                const tanY = centerY - radius * Math.tan(angRad); 
+                ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(tanAxisX, tanY);
+                ctx.strokeStyle = COR_RAIO; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+                ctx.beginPath(); ctx.moveTo(tanAxisX, centerY); ctx.lineTo(tanAxisX, tanY);    
+                ctx.strokeStyle = COR_TANGENTE; ctx.lineWidth = 3; ctx.stroke();
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = COR_TANGENTE;
+                ctx.fillText('tan', tanAxisX + 8, centerY + (tanY - centerY) / 2);
+            }
+
+            // 5. Raio, Ponto e Legendas
+            ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(x, y);
+            ctx.strokeStyle = COR_RAIO; ctx.lineWidth = 2; ctx.stroke();
+            ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * PI);
+            ctx.fillStyle = COR_CIRCULO; ctx.fill();
+            ctx.beginPath(); ctx.arc(centerX, centerY, 30, 0, -angRad, true); 
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.font = 'bold 16px Arial'; 
+            ctx.fillStyle = COR_COSSENO;
+            ctx.fillText('cos', centerX + (x - centerX) / 2, centerY + 20);
+            ctx.fillStyle = COR_SENO;
+            ctx.fillText('sin', x + 8, centerY + (y - centerY) / 2);
+            ctx.fillStyle = COR_CIRCULO;
+            ctx.fillText(`${angDeg.toFixed(1)}°`, x + 10, y - 10);
+        }
+
+        /**
+         * MODIFICADO: Atualiza o painel de texto com valores NOTÁVEIS.
+         */
+        function atualizarResultadosTexto(angUsuario, ang, rad) {
+            angNormOutput.textContent = `${ang.toFixed(2)}°`;
+            
+            let quadrante = '-';
+            let sinalSeno = '-', sinalCos = '-', sinalTan = '-';
+            let classeSeno = '', classeCos = '', classeTan = '';
+
+            // --- Lógica de Valores ---
+            
+            // 1. Trata os Eixos (valores exatos)
+            if (ang === 0 || ang === 360) {
+                quadrante = 'Eixo X+';
+                sinalSeno = '0';     classeSeno = 'zero';
+                sinalCos  = '+1';    classeCos  = 'pos';
+                sinalTan  = '0';     classeTan  = 'zero';
+            } else if (ang === 90) {
+                quadrante = 'Eixo Y+';
+                sinalSeno = '+1';    classeSeno = 'pos';
+                sinalCos  = '0';     classeCos  = 'zero';
+                sinalTan  = 'Indefinido'; classeTan = 'undef';
+            } else if (ang === 180) {
+                quadrante = 'Eixo X-';
+                sinalSeno = '0';     classeSeno = 'zero';
+                sinalCos  = '-1';    classeCos  = 'neg';
+                sinalTan  = '0';     classeTan  = 'zero';
+            } else if (ang === 270) {
+                quadrante = 'Eixo Y-';
+                sinalSeno = '-1';    classeSeno = 'neg';
+                sinalCos  = '0';     classeCos  = 'zero';
+                sinalTan  = 'Indefinido'; classeTan = 'undef';
+            } 
+            else { // 2. Trata os Quadrantes
+                // Encontra o ângulo de referência
+                let angRefDeg = ang;
+                if (ang > 90 && ang < 180) { angRefDeg = 180 - ang; quadrante = '2º Quadrante'; }
+                else if (ang > 180 && ang < 270) { angRefDeg = ang - 180; quadrante = '3º Quadrante'; }
+                else if (ang > 270 && ang < 360) { angRefDeg = 360 - ang; quadrante = '4º Quadrante'; }
+                else { quadrante = '1º Quadrante'; }
+
+                // Define os sinais baseado no quadrante
+                const signSin = (ang > 180) ? '-' : '';
+                const signCos = (ang > 90 && ang < 270) ? '-' : '';
+                const signTan = (signSin === signCos) ? '' : '-'; // Se sinais iguais, tan é +, senão -
+
+                const classSin = (ang > 180) ? 'neg' : 'pos';
+                const classCos = (ang > 90 && ang < 270) ? 'neg' : 'pos';
+                const classTan = (signSin === signCos) ? 'pos' : 'neg';
+
+                // Verifica se é um ângulo notável (usando tolerância)
+                if (Math.abs(angRefDeg - 30) < 0.001) {
+                    sinalSeno = signSin + VAL_SIN_30; classeSeno = classSin;
+                    sinalCos  = signCos + VAL_COS_30; classeCos  = classCos;
+                    sinalTan  = signTan + VAL_TAN_30; classeTan  = classTan;
+                }
+                else if (Math.abs(angRefDeg - 45) < 0.001) {
+                    sinalSeno = signSin + VAL_SIN_45; classeSeno = classSin;
+                    sinalCos  = signCos + VAL_COS_45; classeCos  = classCos;
+                    sinalTan  = signTan + VAL_TAN_45; classeTan  = classTan;
+                }
+                else if (Math.abs(angRefDeg - 60) < 0.001) {
+                    sinalSeno = signSin + VAL_SIN_60; classeSeno = classSin;
+                    sinalCos  = signCos + VAL_COS_60; classeCos  = classCos;
+                    sinalTan  = signTan + VAL_TAN_60; classeTan  = classTan;
+                }
+                else { // 3. Se não for Eixo nem Notável, usa Decimal
+                    sinalSeno = Math.sin(rad).toFixed(4); classeSeno = classSin;
+                    sinalCos  = Math.cos(rad).toFixed(4); classeCos  = classCos;
+                    sinalTan  = Math.tan(rad).toFixed(4); classeTan  = classTan;
                 }
             }
-            return `${ratio.toFixed(3)}&pi;`;
+            
+            // 4. Atualiza o HTML
+            quadranteOutput.textContent = quadrante;
+            senoOutput.innerHTML = sinalSeno; // innerHTML para renderizar &radic;
+            senoOutput.className = classeSeno;
+            cossenoOutput.innerHTML = sinalCos; // innerHTML
+            cossenoOutput.className = classeCos;
+            tangenteOutput.innerHTML = sinalTan; // innerHTML
+            tangenteOutput.className = classeTan;
         }
 
-        /**
-         * Encontra as coordenadas (x, y) de um ponto na elipse/círculo
-         */
-        function getPointOnShapePerimeter(shape, angleDeg) {
-            const angleRad = degToRad(angleDeg);
-            const cosA = Math.cos(angleRad);
-            const sinA = Math.sin(angleRad);
-            
-            // Equação paramétrica
-            const x = shape.cx + shape.rx * cosA;
-            const y = shape.cy - shape.ry * sinA; // Y invertido no DOM
-            return { x, y };
-        }
 
-        /**
-         * Calcula o ângulo polar (em graus) de um ponto (px, py) em relação ao centro (cx, cy).
-         */
-        function getAngleFromPoint(shape, px, py) {
-            const dx = px - shape.cx;
-            const dy = shape.cy - py; 
-            
-            let angleRad = Math.atan2(dy, dx);
-            let angleDeg = radToDeg(angleRad);
-            
-            if (angleDeg < 0) angleDeg += 360;
-            return angleDeg;
-        }
-
-        function findNearestShapeAndAngle(px, py) {
-            if (shapes.length === 0) return null;
-            
-            let nearestShape = null;
-            let minDistance = Infinity;
-
-            shapes.forEach(shape => {
-                const dist = Math.sqrt(Math.pow(px - shape.cx, 2) + Math.pow(py - shape.cy, 2));
-                if (dist < minDistance) { 
-                    minDistance = dist;
-                    nearestShape = shape;
-                }
-            });
-            if (!nearestShape) return null;
-            
-            const angleDeg = getAngleFromPoint(nearestShape, px, py);
-            const pointOnPerimeter = getPointOnShapePerimeter(nearestShape, angleDeg);
-
-            return { shape: nearestShape, angleDeg, x: pointOnPerimeter.x, y: pointOnPerimeter.y };
-        }
+        // --- Funções do Conversor (Painel Esquerdo) ---
         
-        function getRelativeCoords(e) {
-            const rect = simulationArea.getBoundingClientRect();
-            const event = e.touches && e.touches.length > 0 ? e.touches[0] : e;
-            const clientX = event.clientX;
-            const clientY = event.clientY;
-
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
-        }
-        
-        // ----------------- Funções de Modo e UI -----------------
-
-        function setMode(newMode) {
-            currentMode = newMode;
-            let text = '';
-            let color = '';
-            
-            switch (newMode) {
-                case 'IDLE':
-                    text = 'SELECIONE UMA AÇÃO'; color = '#8a6d3b';
-                    break;
-                case 'DRAWING_CIRCLE':
-                case 'DRAWING_ELLIPSE':
-                    text = 'DESENHANDO FORMA. Clique para definir o centro.'; color = '#3498db';
-                    break;
-                case 'PLACING_POINT':
-                    text = 'COLOCANDO PONTO. Clique em uma forma.'; color = '#e67e22';
-                    previewPoint.style.display = 'block';
-                    break;
-                case 'RESIZING_SHAPE':
-                    text = 'REDIMENSIONANDO FORMA.'; color = '#e74c3c';
-                    break;
-                case 'MOVING_SHAPE':
-                    text = 'MOVER FORMA.'; color = '#2ecc71';
-                    break;
-                case 'DRAGGING_POINT':
-                    text = 'ARRASTANDO PONTO.'; color = '#e74c3c';
-                    break;
+        // Função auxiliar para encontrar o Maior Divisor Comum (para simplificar frações)
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
             }
-            currentModeText.textContent = text;
-            modeIndicator.style.borderColor = color;
-            modeIndicator.style.color = color;
+            return a;
+        }
+        
+        // Função auxiliar para converter graus em fração de Pi (Request 2)
+        function degToPiFraction(deg) {
+            if (deg === 0) return "0";
+            
+            // Simplifica a fração deg/180
+            const common = gcd(deg, 180);
+            let num = deg / common;
+            let den = 180 / common;
 
-            if (newMode !== 'PLACING_POINT') {
-                previewPoint.style.display = 'none';
+            // Formata a string de saída
+            if (den === 1) {
+                return (num === 1) ? "&pi;" : `${num}&pi;`;
             }
+            if (num === 1) {
+                return `&pi;/${den}`;
+            }
+            return `${num}&pi;/${den}`;
         }
         
-        function toggleCalculationPanel() {
-            calcStepsPanel.classList.toggle('collapsed');
-            const icon = toggleCalcButton.querySelector('i');
-            if (calcStepsPanel.classList.contains('collapsed')) {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
-            } else {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
-            }
+        // Atualiza o conversor Graus -> Rad (Decimal e Fração)
+        function updateDegToRad() {
+            const deg = parseFloat(conv_deg_in.value) || 0;
+            // Saída Decimal
+            conv_rad_out.value = (deg * (PI / 180)).toFixed(4);
+            // Saída Fração Pi
+            conv_rad_frac_out.innerHTML = degToPiFraction(deg);
         }
         
-        /**
-         * Lógica do Conversor de Ângulo
-         */
-        function updateConverter() {
-            const deg = parseFloat(degInput.value);
-            if (isNaN(deg)) {
-                radOutput.value = 'Insira um número válido.';
+        // Atualiza o conversor Rad (Fração) -> Graus (Request 3)
+        function updateRadFracToDeg() {
+            const num = parseFloat(conv_rad_num.value) || 0;
+            const den = parseFloat(conv_rad_den.value) || 1; // Padrão de 1 para evitar div/0
+            
+            if (den === 0) {
+                conv_deg_out.value = "Div/0!";
                 return;
             }
             
-            const rad = degToRad(deg);
-            const piStr = radToPiString(rad).replace(/&pi;/g, 'π'); 
-            
-            radOutput.value = `${rad.toFixed(5)} rad (≈ ${piStr})`;
+            const deg = (num / den) * 180;
+            conv_deg_out.value = deg.toFixed(4);
         }
 
-
-        /**
-         * Renderiza o painel de controle dinâmico para cada ponto orbital.
-         */
-        function renderPointControls() {
-            pointsControlContainer.innerHTML = '';
+        // --- Inicialização ---
+        function initialize() {
+            window.addEventListener('resize', handleResize);
             
-            if (orbitingPoints.length === 0) {
-                pointsControlContainer.innerHTML = '<p style="font-size: 0.9em; color: #999;">Crie um ponto orbital para começar.</p>';
-                simulateAllButton.disabled = true;
-                return;
-            }
+            // Listeners do Painel Esquerdo
+            conv_deg_in.addEventListener('input', updateDegToRad);
+            conv_rad_num.addEventListener('input', updateRadFracToDeg);
+            conv_rad_den.addEventListener('input', updateRadFracToDeg);
             
-            orbitingPoints.forEach(point => {
-                const item = document.createElement('div');
-                item.classList.add('point-config-item');
-                item.setAttribute('data-point-id', point.id);
-                
-                const pointColor = point.domElement ? point.domElement.style.backgroundColor : 'gray';
-                
-                item.innerHTML = `
-                    <div class="point-header">
-                        <div class="point-color-indicator" style="background-color: ${pointColor};"></div>
-                        <span>Ponto ${point.id} na Forma ${point.shapeId}</span>
-                    </div>
-                    <div class="point-input-row">
-                        <label>Ângulo Inicial (°): 
-                            <input type="number" class="input-field point-initial-angle" value="${point.initialAngleDeg.toFixed(1)}" min="0" max="360" step="0.1" data-id="${point.id}">
-                        </label>
-                    </div>
-                    <div class="point-input-row">
-                        <label>Ângulo do Arco (°): 
-                            <input type="number" class="input-field point-arc-angle" value="${point.arcAngleDeg}" data-id="${point.id}">
-                        </label>
-                    </div>
-                    <div class="point-input-row">
-                        <label>Velocidade (deg/frame): 
-                            <input type="number" class="input-field point-velocity" value="${point.velocityDegPerFrame}" min="0.5" max="100" step="0.5" data-id="${point.id}">
-                        </label>
-                    </div>
-                `;
-                pointsControlContainer.appendChild(item);
-            });
-            
-            // Adiciona listeners para os novos inputs
-            pointsControlContainer.querySelectorAll('.point-initial-angle').forEach(input => {
-                input.addEventListener('change', handleInitialAngleChange);
-            });
-            pointsControlContainer.querySelectorAll('.point-arc-angle').forEach(input => {
-                input.addEventListener('change', handleArcAngleChange);
-            });
-            pointsControlContainer.querySelectorAll('.point-velocity').forEach(input => {
-                input.addEventListener('change', handleVelocityChange);
-            });
-
-            simulateAllButton.disabled = orbitingPoints.length === 0;
+            // Chama as funções pela primeira vez
+            handleResize(); 
+            updateDegToRad(); 
+            updateRadFracToDeg(); 
         }
 
-        function handleInitialAngleChange(e) {
-            const pointId = e.target.getAttribute('data-id');
-            const newAngle = parseFloat(e.target.value);
-            const point = orbitingPoints.find(p => p.id === pointId);
-            
-            if (point && !isNaN(newAngle)) {
-                let normalizedAngle = newAngle % 360;
-                if (normalizedAngle < 0) normalizedAngle += 360;
-                
-                point.initialAngleDeg = normalizedAngle;
-                point.currentAngle = normalizedAngle; 
-                updateOrbitingPointPosition(point, normalizedAngle);
-                
-                e.target.value = normalizedAngle.toFixed(1); 
-            }
-        }
-        
-        function handleArcAngleChange(e) {
-            const pointId = e.target.getAttribute('data-id');
-            const newArc = parseFloat(e.target.value);
-            const point = orbitingPoints.find(p => p.id === pointId);
-            
-            if (point && !isNaN(newArc)) {
-                point.arcAngleDeg = newArc;
-            }
-        }
-
-        function handleVelocityChange(e) {
-            const pointId = e.target.getAttribute('data-id');
-            let newVelocity = parseFloat(e.target.value);
-            const point = orbitingPoints.find(p => p.id === pointId);
-            
-            if (point && !isNaN(newVelocity) && newVelocity > 0) {
-                newVelocity = Math.max(0.5, newVelocity); 
-                point.velocityDegPerFrame = newVelocity;
-                e.target.value = newVelocity;
-            }
-        }
-
-        // ----------------- Funções de Criação, Edição e DELEÇÃO -----------------
-        
-        /**
-         * Gerencia a seleção visual e lógica de uma forma.
-         */
-        function selectShape(shape) {
-            // Remove a classe 'selected' da forma anteriormente selecionada
-            if (selectedShape && selectedShape.domElement) {
-                selectedShape.domElement.classList.remove('selected');
-            }
-            
-            if (shape) {
-                selectedShape = shape;
-                shape.domElement.classList.add('selected');
-            } else {
-                selectedShape = null;
-            }
-        }
-
-        /**
-         * Função principal para deletar uma forma e seus pontos orbitais.
-         */
-        function deleteShape(shape) {
-            if (!shape) return;
-
-            const shapeId = shape.id;
-
-            // 1. Remove pontos orbitais associados à forma do DOM e do array
-            orbitingPoints = orbitingPoints.filter(point => {
-                if (point.shapeId === shapeId) {
-                    if (point.domElement && simulationArea.contains(point.domElement)) {
-                        simulationArea.removeChild(point.domElement);
-                    }
-                    return false; // Remove do array
-                }
-                return true;
-            });
-
-            // 2. Remove a forma do DOM
-            if (shape.domElement && simulationArea.contains(shape.domElement)) {
-                simulationArea.removeChild(shape.domElement);
-            }
-
-            // 3. Remove a forma do array de shapes
-            shapes = shapes.filter(s => s.id !== shapeId);
-
-            // 4. Reset a seleção e atualiza a UI
-            selectedShape = null;
-            renderPointControls();
-
-            // Re-checa se o botão de colocar ponto deve ser desabilitado
-            if (shapes.length === 0) {
-                placePointButton.disabled = true;
-            }
-        }
-
-
-        function createInitialShape(type, cx, cy) {
-            const id = `S${shapes.length + 1}`;
-            const initialRadius = 40; 
-            const rx = initialRadius, ry = initialRadius; 
-            
-            const shapeDOM = document.createElement('div');
-            shapeDOM.classList.add('shape', type);
-            shapeDOM.setAttribute('data-id', id);
-            
-            shapeDOM.style.left = `${cx - rx}px`;
-            shapeDOM.style.top = `${cy - ry}px`;
-            shapeDOM.style.width = `${rx * 2}px`;
-            shapeDOM.style.height = `${ry * 2}px`;
-            
-            shapeDOM.style.pointerEvents = 'auto'; 
-            simulationArea.appendChild(shapeDOM);
-
-            const newShape = { id, type, cx, cy, rx, ry, domElement: shapeDOM, initialClickX: cx, initialClickY: cy };
-            shapes.push(newShape);
-            activeShape = newShape;
-
-            // Usa 'mousedown' para mover E selecionar
-            shapeDOM.addEventListener('mousedown', (e) => handleShapeMouseDown(e, newShape));
-            shapeDOM.addEventListener('touchstart', (e) => handleShapeMouseDown(e.touches[0], newShape));
-
-            return newShape;
-        }
-        
-        function handleShapeMouseDown(e, shape) {
-            // Seleciona a forma primeiro. Se estiver desenhando/redimensionando, a seleção é tratada no mouseup.
-            if (currentMode !== 'RESIZING_SHAPE') {
-                selectShape(shape);
-            }
-
-            // Apenas inica o movimento se estiver no modo IDLE
-            if (currentMode === 'IDLE') {
-                activeShape = shape;
-                isMovingShape = true;
-                const coords = getRelativeCoords(e);
-                startX = coords.x;
-                startY = coords.y;
-                activeShape.offsetX = activeShape.cx - startX;
-                activeShape.offsetY = activeShape.cy - startY;
-                setMode('MOVING_SHAPE');
-                e.stopPropagation(); 
-            }
-        }
-
-
-        function handleMouseDown(e) {
-            const coords = getRelativeCoords(e);
-
-            if (currentMode === 'DRAWING_CIRCLE' || currentMode === 'DRAWING_ELLIPSE') {
-                if (e.target !== simulationArea) return; 
-                
-                selectShape(null); // Limpa a seleção ao começar um novo desenho
-                
-                const type = currentMode === 'DRAWING_CIRCLE' ? 'circle' : 'ellipse';
-                activeShape = createInitialShape(type, coords.x, coords.y);
-                isDrawingNewShape = true;
-                setMode('RESIZING_SHAPE');
-                
-            } else if (currentMode === 'PLACING_POINT') {
-                const nearest = findNearestShapeAndAngle(coords.x, coords.y);
-                if (nearest && e.target.classList.contains('shape')) {
-                    createOrbitingPoint(nearest.shape, nearest.angleDeg);
-                    selectShape(null); // Limpa a seleção após colocar o ponto
-                    setMode('IDLE');
-                }
-            } else if (e.target.classList.contains('orbit-point')) {
-                activePoint = orbitingPoints.find(p => p.domElement === e.target);
-                if (activePoint) {
-                    selectShape(null); // Limpa a seleção da forma ao arrastar ponto
-                    isDraggingPoint = true;
-                    e.stopPropagation(); 
-                    setMode('DRAGGING_POINT');
-                }
-            } else if (e.target === simulationArea) {
-                // Clique na área de simulação deseleciona a forma
-                selectShape(null);
-            }
-        }
-
-        function handleMouseMove(e) {
-            const coords = getRelativeCoords(e);
-            
-            if (isDrawingNewShape && activeShape) {
-                const dx = coords.x - activeShape.cx;
-                const dy = coords.y - activeShape.cy;
-                let rx = Math.abs(dx);
-                let ry = Math.abs(dy);
-
-                if (activeShape.type === 'circle') {
-                    const r = Math.sqrt(dx * dx + dy * dy);
-                    rx = r;
-                    ry = r;
-                }
-                
-                rx = Math.max(10, rx);
-                ry = Math.max(10, ry);
-
-                activeShape.rx = rx;
-                activeShape.ry = ry;
-                
-                activeShape.domElement.style.left = `${activeShape.cx - rx}px`;
-                activeShape.domElement.style.top = `${activeShape.cy - ry}px`;
-                activeShape.domElement.style.width = `${rx * 2}px`;
-                activeShape.domElement.style.height = `${ry * 2}px`;
-                
-            } else if (isMovingShape && activeShape) {
-                const newCx = coords.x + activeShape.offsetX;
-                const newCy = coords.y + activeShape.offsetY;
-                
-                activeShape.cx = newCx;
-                activeShape.cy = newCy;
-
-                activeShape.domElement.style.left = `${activeShape.cx - activeShape.rx}px`;
-                activeShape.domElement.style.top = `${activeShape.cy - activeShape.ry}px`;
-
-                orbitingPoints.filter(p => p.shapeId === activeShape.id).forEach(point => {
-                    updateOrbitingPointPosition(point, point.currentAngle);
-                });
-
-            } else if (currentMode === 'PLACING_POINT') {
-                const nearest = findNearestShapeAndAngle(coords.x, coords.y);
-                if (nearest) {
-                    previewPoint.style.left = `${nearest.x}px`;
-                    previewPoint.style.top = `${nearest.y}px`;
-                    previewPoint.style.display = 'block';
-                } else {
-                    previewPoint.style.display = 'none';
-                }
-            } else if (currentMode === 'DRAGGING_POINT' && isDraggingPoint && activePoint) {
-                const nearest = findNearestShapeAndAngle(coords.x, coords.y);
-                if (nearest && nearest.shape.id === activePoint.shapeId) {
-                    const newAngle = getAngleFromPoint(nearest.shape, coords.x, coords.y);
-                    
-                    let normalizedAngle = newAngle % 360;
-                    if (normalizedAngle < 0) normalizedAngle += 360;
-                    activePoint.initialAngleDeg = normalizedAngle;
-                    activePoint.currentAngle = normalizedAngle;
-                    
-                    updateOrbitingPointPosition(activePoint, newAngle);
-                    renderPointControls(); 
-                }
-            }
-        }
-
-        function handleMouseUp(e) {
-            if (isDrawingNewShape) {
-                if (activeShape.rx < 15 || activeShape.ry < 15) {
-                    simulationArea.removeChild(activeShape.domElement);
-                    shapes = shapes.filter(s => s.id !== activeShape.id);
-                    selectShape(null);
-                } else {
-                    placePointButton.disabled = false;
-                    selectShape(activeShape); // Mantém a nova forma selecionada
-                }
-                isDrawingNewShape = false;
-                activeShape = null;
-                setMode('IDLE');
-                
-            } else if (isDraggingPoint) {
-                isDraggingPoint = false;
-                activePoint = null;
-                setMode('IDLE');
-            } else if (isMovingShape) {
-                selectShape(activeShape); // Mantém a forma selecionada após o movimento
-                isMovingShape = false;
-                activeShape = null;
-                setMode('IDLE');
-            }
-        }
-        
-        /**
-         * Listener para a tecla Backspace/Delete.
-         */
-        function handleKeyDown(e) {
-            // Não deve deletar se o foco estiver em um campo de texto/input
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-                return;
-            }
-
-            if (e.key === 'Backspace' || e.key === 'Delete') {
-                if (selectedShape) {
-                    e.preventDefault(); // Impede o navegador de voltar (comum no Backspace)
-                    deleteShape(selectedShape);
-                    setMode('IDLE');
-                }
-            }
-        }
-
-        // ----------------- Funções de Ponto Orbital e Simulação -----------------
-        
-        function updateOrbitingPointPosition(point, newAngleDeg, isSimulation = false) {
-            const shape = shapes.find(s => s.id === point.shapeId);
-            if (!shape) return;
-            
-            if (!isSimulation) {
-                let finalAngle = newAngleDeg % 360;
-                if (finalAngle < 0) finalAngle += 360;
-                point.currentAngle = finalAngle;
-                point.initialAngleDeg = finalAngle; 
-            }
-            
-            const pointCoords = getPointOnShapePerimeter(shape, newAngleDeg);
-            point.domElement.style.left = `${pointCoords.x}px`;
-            point.domElement.style.top = `${pointCoords.y}px`;
-        }
-        
-        function createOrbitingPoint(shape, initialAngle) {
-            const id = `P${orbitingPoints.length + 1}`;
-            
-            const pointDOM = document.createElement('div');
-            pointDOM.classList.add('orbit-point');
-            pointDOM.setAttribute('data-id', id);
-            pointDOM.setAttribute('data-shape-id', shape.id);
-            const randomColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
-            pointDOM.style.backgroundColor = randomColor; 
-            simulationArea.appendChild(pointDOM);
-
-            let normalizedAngle = initialAngle % 360;
-            if (normalizedAngle < 0) normalizedAngle += 360;
-            
-            const newPoint = {
-                id: id,
-                shapeId: shape.id,
-                initialAngleDeg: normalizedAngle, 
-                currentAngle: normalizedAngle, 
-                arcAngleDeg: 360, 
-                velocityDegPerFrame: 3.0, 
-                domElement: pointDOM,
-                isDone: false,
-                color: randomColor,
-                calcHtml: '',
-                animation: {} 
-            };
-            
-            orbitingPoints.push(newPoint);
-
-            pointDOM.addEventListener('mousedown', handleMouseDown); 
-
-            updateOrbitingPointPosition(newPoint, normalizedAngle);
-            renderPointControls(); 
-        }
-
-        // ----------------- Simulação Múltipla -----------------
-        
-        function calculateArcProperties(point) {
-            const initialAngleDeg = point.initialAngleDeg;
-            const arcAngleDeg = point.arcAngleDeg;
-            const totalTraveledAngle = initialAngleDeg + arcAngleDeg;
-
-            let remainder = totalTraveledAngle % 360;
-            let congruentAngle = remainder;
-            if (congruentAngle < 0) congruentAngle += 360;
-            
-            const rotations = arcAngleDeg === 0 ? 0 : Math.floor(totalTraveledAngle / 360) - Math.floor(initialAngleDeg / 360);
-            
-            const finalCongruentRad = degToRad(congruentAngle);
-            const initialRad = degToRad(initialAngleDeg);
-            const arcRad = degToRad(arcAngleDeg);
-            
-            // Cálculo do Seno e Cosseno do Ângulo Congruente
-            const sinAlpha = Math.sin(finalCongruentRad).toFixed(4); 
-            const cosAlpha = Math.cos(finalCongruentRad).toFixed(4); 
-
-
-            point.animation = {
-                startAngle: initialAngleDeg,
-                totalTargetAngle: totalTraveledAngle,
-                angleDifference: arcAngleDeg,
-                finalCongruentAngle: congruentAngle,
-                rotations: rotations,
-                finalCongruentRadStr: radToPiString(finalCongruentRad),
-                initialRadStr: radToPiString(initialRad),
-                arcRadStr: radToPiString(arcRad),
-                // PROPRIEDADES TRIGONOMÉTRICAS
-                sinAlpha: sinAlpha, 
-                cosAlpha: cosAlpha,
-            };
-        }
-        
-        function simulateAllArcs() {
-            if (orbitingPoints.length === 0) return;
-            
-            // 1. Prepara todos os pontos para a simulação
-            orbitingPoints.forEach(point => {
-                calculateArcProperties(point);
-                point.currentAngle = point.initialAngleDeg; 
-                point.isDone = false;
-                point.calcHtml = ''; 
-                point.domElement.classList.add('active'); 
-            });
-            
-            isAnimating = true;
-            simulateAllButton.disabled = true;
-            calcStepsContent.innerHTML = ''; 
-
-            // 2. Inicia o loop de animação
-            requestAnimationFrame(animateAllPoints);
-        }
-        
-        function animateAllPoints(timestamp) {
-            if (!isAnimating) return;
-
-            let allDone = true;
-            
-            orbitingPoints.forEach(point => {
-                if (!point.isDone) {
-                    allDone = false;
-                    
-                    const animationProps = point.animation;
-                    const velocity = point.velocityDegPerFrame;
-                    
-                    const angleTraveledInFrame = velocity * Math.sign(animationProps.angleDifference);
-                    
-                    const angleDifferenceRemaining = animationProps.totalTargetAngle - point.currentAngle;
-                    
-                    let nextAngle;
-                    
-                    if (Math.abs(angleDifferenceRemaining) <= Math.abs(angleTraveledInFrame)) {
-                        nextAngle = animationProps.totalTargetAngle;
-                        point.isDone = true;
-                    } else {
-                        nextAngle = point.currentAngle + angleTraveledInFrame;
-                    }
-                    
-                    point.currentAngle = nextAngle;
-                    updateOrbitingPointPosition(point, nextAngle, true);
-                    
-                    // Geração e armazenamento do resultado final
-                    if (point.isDone) {
-                        point.calcHtml = displayCalculationSteps(point);
-                        point.domElement.classList.remove('active');
-                        
-                        // Exibe o anúncio final
-                        const finalCongruentRadStr = point.animation.finalCongruentRadStr.replace(/&pi;/g, 'π');
-                        angleAnnouncement.innerHTML = `ÂNGULO FINAL (${point.id}): <strong>${point.animation.finalCongruentAngle.toFixed(1)}°</strong> <br>(${finalCongruentRadStr})`;
-                        angleAnnouncement.classList.add('show');
-                        setTimeout(() => angleAnnouncement.classList.remove('show'), 3000);
-                    }
-                }
-            });
-            
-            // 3. Verifica o estado final e renderiza o cálculo
-            if (allDone) {
-                isAnimating = false;
-                simulateAllButton.disabled = false;
-                
-                let finalOutput = orbitingPoints.map(p => p.calcHtml).join('');
-                calcStepsContent.innerHTML = finalOutput; 
-                
-            } else {
-                requestAnimationFrame(animateAllPoints);
-            }
-        }
-        
-        /**
-         * Gera o HTML para o painel de cálculo de um ponto específico.
-         */
-        function displayCalculationSteps(point) {
-            const props = point.animation;
-            
-            let html = '<div class="calc-step-item">';
-            
-            // Header
-            html += '<div class="calc-step-header" onclick="toggleStepContent(this)">';
-            html += `<div class="point-color-indicator" style="background-color: ${point.color};"></div>`;
-            html += `<span>Ponto ${point.id} (Forma ${point.shapeId}) - Resultado Final</span>`;
-            html += '<i class="fas fa-chevron-right"></i>';
-            html += '</div>';
-            
-            // Content
-            html += '<div class="calc-step-content">';
-            html += `
-                <p>Ângulo Inicial ($\\theta_{inicial}$): <strong>${point.initialAngleDeg.toFixed(1)}°</strong> ($\\approx$ ${props.initialRadStr})</p>
-                <p>Ângulo do Arco ($\\theta_{arco}$): <strong>${props.angleDifference.toFixed(1)}°</strong> ($\\approx$ ${props.arcRadStr})</p>
-                <p>Voltas Completas (k): <strong>${props.rotations}</strong></p>
-                <hr style="border-top: 1px solid #ccc;">
-                <p style="font-size: 1.1em; color: #3498db;">Ângulo Congruente ($\\alpha$): <strong>${props.finalCongruentAngle.toFixed(1)}°</strong> ($\\approx$ ${props.finalCongruentRadStr})</p>
-                
-                <div class="trigonometric-result">
-                    <p>Seno ($\\sin(\\alpha)$): <strong>${props.sinAlpha}</strong></p>
-                    <p>Cosseno ($\\cos(\\alpha)$): <strong>${props.cosAlpha}</strong></p>
-                </div>
-
-                <p class="formula"> **Fórmula (Congruente):** $\\alpha = \\theta_{inicial} + \\theta_{arco} - k \\cdot 360°$</p>
-                <p class="formula"> **Cálculo (Trig.):** $\\sin(\\alpha) = \\sin(\\alpha_{rad})$ e $\\cos(\\alpha) = \\cos(\\alpha_{rad})$</p>
-            `;
-            html += '</div></div>';
-            
-            return html;
-        }
-        
-        // Função global para o evento de clique do cabeçalho de cálculo
-        window.toggleStepContent = function(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('i');
-            
-            if (content.style.display === 'block') {
-                content.style.display = 'none';
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-right');
-                header.classList.remove('open');
-            } else {
-                content.style.display = 'block';
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-down');
-                header.classList.add('open');
-            }
-        }
-
-
-        // ----------------- Inicialização e Eventos -----------------
-        
-        function initializeSimulador() {
-            console.log(`[INIT V23.0] Destaque Trigonométrico Ativado.`);
-            setMode('IDLE'); 
-
-            // 1. CONFIGURAÇÃO DOS BOTÕES
-            drawCircleButton.addEventListener('click', () => setMode('DRAWING_CIRCLE'));
-            drawEllipseButton.addEventListener('click', () => setMode('DRAWING_ELLIPSE'));
-            placePointButton.addEventListener('click', () => setMode('PLACING_POINT'));
-            simulateAllButton.addEventListener('click', simulateAllArcs);
-            toggleCalcButton.addEventListener('click', toggleCalculationPanel);
-            
-            // Evento do conversor
-            degInput.addEventListener('input', updateConverter);
-            updateConverter();
-
-
-            // 2. EVENTOS DE INTERAÇÃO NA ÁREA DE SIMULAÇÃO
-            simulationArea.addEventListener('mousedown', handleMouseDown);
-            simulationArea.addEventListener('touchstart', (e) => { 
-                if (e.target.classList.contains('orbit-point') || e.target.classList.contains('shape')) {
-                    handleMouseDown(e); 
-                } else if (currentMode === 'DRAWING_CIRCLE' || currentMode === 'DRAWING_ELLIPSE') {
-                    e.preventDefault(); 
-                    handleMouseDown(e); 
-                }
-            });
-
-            // 3. EVENTOS GLOBAIS (para arrastar, soltar e deletar)
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-            document.addEventListener('touchmove', (e) => { 
-                if (isDrawingNewShape || isDraggingPoint || isMovingShape) {
-                    e.preventDefault(); 
-                }
-                handleMouseMove(e); 
-            });
-            document.addEventListener('touchend', handleMouseUp);
-            document.addEventListener('keydown', handleKeyDown); 
-        }
-
-        initializeSimulador();
+        initialize();
     </script>
+
 </body>
 </html>
