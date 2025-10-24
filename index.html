@@ -39,12 +39,13 @@
             border-bottom: 1px solid #ddd; 
         }
 
-        /* Link do Logo */
+        /* Link do Logo (MODIFICADO PARA IMAGEM) */
         .logo-link {
             text-decoration: none;
-            color: #D2691E; 
-            font-size: 18px;
-            font-weight: bold;
+            /* Estilos de texto do logo antigo (comentados/removidos) */
+            /* color: #D2691E; */ 
+            /* font-size: 18px; */
+            /* font-weight: bold; */
             padding: 0 25px; 
             display: flex;
             align-items: center; 
@@ -56,9 +57,17 @@
             background-color: #f5f5f5;
         }
 
-        .logo-link .fas {
-            margin-right: 10px;
+        /* NOVO ESTILO: Imagem do Banner */
+        .logo-link .logo-image {
+            height: 70px; /* Altura que preenche o espaço */
+            width: auto;
+            object-fit: fill; /* Deforma a imagem para preencher o espaço */
         }
+
+        /* Estilo para ícone do logo (REMOVIDO, POIS AGORA É IMAGEM) */
+        /* .logo-link .fas {
+            margin-right: 10px;
+        } */
 
         .nav-buttons {
             display: flex;
@@ -266,7 +275,7 @@
 
     <header class="top-bar">
         <a href="index.html" class="logo-link">
-            <i class="fas fa-book-reader"></i> PLATAFORMA
+            <img src="assets/simulab_banner.png" alt="SimuLab Logo e Plataforma" class="logo-image">
         </a>
 
         <div class="nav-buttons">
@@ -756,5 +765,3 @@
     </script>
 </body>
 </html>
-
-
